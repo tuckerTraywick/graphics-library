@@ -53,6 +53,6 @@ void window_fill(struct window *window, unsigned long color) {
 
 void window_draw_line(struct window *window, unsigned long color, unsigned int line_width, int x1, int y1, int x2, int y2) {
 	XSetForeground(window->x_display, window->x_context, color);
-	XSetLineAttributes(window->x_display, window->x_context, line_width, LineSolid, CapButt, JoinMiter);
+	XSetLineAttributes(window->x_display, window->x_context, line_width, LineSolid, CapButt, JoinRound);
 	XDrawLine(window->x_display, window->x_window, window->x_context, x1, y1, x2, y2);
 }
