@@ -30,4 +30,8 @@ void window_fill(struct window *window, unsigned long color);
 
 void window_draw_line(struct window *window, unsigned long color, unsigned int line_width, int x1, int y1, int x2, int y2);
 
+void window_draw_rectangle(struct window *window, unsigned long color, unsigned int line_width, int x, int y, unsigned int width, unsigned int height);
+
+void window_draw_rectangle_filled(struct window *window, unsigned long color, int x, int y, unsigned int width, unsigned int height);
+
 #endif // GRAPHICS_H

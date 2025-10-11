@@ -12,8 +12,7 @@ int main(void) {
 
 	while (window_is_open(window)) {
 		window_fill(window, COLOR_BLACK);
-		window_draw_line(window, COLOR_BLUE, 4, 0, 0, 100, 100);
-		window_draw_line(window, COLOR_BLUE, 4, 100, 100, 100, 0);
+		window_draw_rectangle_filled(window, COLOR_BLUE, 10, 10, 100, 100);
 		window_flush(window);
 		usleep(1000);
 	}

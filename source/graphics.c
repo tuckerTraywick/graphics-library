@@ -56,3 +56,14 @@ void window_draw_line(struct window *window, unsigned long color, unsigned int l
 	XSetLineAttributes(window->x_display, window->x_context, line_width, LineSolid, CapButt, JoinRound);
 	XDrawLine(window->x_display, window->x_window, window->x_context, x1, y1, x2, y2);
 }
+
+void window_draw_rectangle(struct window *window, unsigned long color, unsigned int line_width, int x, int y, unsigned int width, unsigned int height) {
+	XSetForeground(window->x_display, window->x_context, color);
+	XSetLineAttributes(window->x_display, window->x_context, line_width, LineSolid, CapButt, JoinRound);
+	XDrawRectangle(window->x_display, window->x_window, window->x_context, x, y, width, height);	
+}
+
+void window_draw_rectangle_filled(struct window *window, unsigned long color, int x, int y, unsigned int width, unsigned int height) {
+	XSetForeground(window->x_display, window->x_context, color);
+	XFillRectangle(window->x_display, window->x_window, window->x_context, x, y, width, height);	
+}
