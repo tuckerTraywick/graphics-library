@@ -1,5 +1,8 @@
+#include <stdio.h>
+
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include "graphics.h"
@@ -21,9 +24,9 @@ struct window *window_create(char *name, unsigned int width, unsigned int height
 	// Setup the X grahpics context.
 	int screen_number = DefaultScreen(window->x_display);
 	XGCValues values = {
-		.foreground = BlackPixel(window->x_display, screen_number),
+		.foreground = WhitePixel(window->x_display, screen_number),
 		.background = BlackPixel(window->x_display, screen_number),
-		.line_width = 2,
+		.line_width = 1,
 		.line_style = LineSolid,
 	};
 	unsigned long mask = GCBackground | GCForeground | GCLineWidth | GCLineStyle;
@@ -46,6 +49,16 @@ void window_flush(struct window *window) {
 	XFlush(window->x_display);
 }
 
+bool window_load_font(struct window *window, char *font_name) {
+	XFontStruct *font = XLoadQueryFont(window->x_display, font_name);
+	if (!font) {
+		return false;
+	}
+	XSetFont(window->x_display, window->x_context, font->fid);
+	// XFreeFont(window->x_display, font);
+	return true;
+}
+
 void window_fill(struct window *window, unsigned long color) {
 	XSetWindowBackground(window->x_display, window->x_window, color);
 	XClearWindow(window->x_display, window->x_window);
@@ -66,4 +79,9 @@ void window_draw_rectangle(struct window *window, unsigned long color, unsigned 
 void window_draw_rectangle_filled(struct window *window, unsigned long color, int x, int y, unsigned int width, unsigned int height) {
 	XSetForeground(window->x_display, window->x_context, color);
 	XFillRectangle(window->x_display, window->x_window, window->x_context, x, y, width, height);	
+}
+
+void window_draw_text(struct window *window, char *text, unsigned long color, int x, int y) {
+	XSetForeground(window->x_display, window->x_context, color);
+	XDrawString(window->x_display, window->x_window, window->x_context, x, y, text, strlen(text));
 }

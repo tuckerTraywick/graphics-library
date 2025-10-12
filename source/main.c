@@ -10,13 +10,17 @@ int main(void) {
 		return 1;
 	}
 
+	int i = 0;
 	while (window_is_open(window)) {
 		window_fill(window, COLOR_BLACK);
-		window_draw_rectangle_filled(window, COLOR_BLUE, 10, 10, 100, 100);
+		window_draw_rectangle(window, COLOR_BLUE, 2, 10, i, 100, 100);
+		window_draw_text(window, "hello world", COLOR_WHITE, i, 20);
 		window_flush(window);
 		usleep(1000);
+		i = (i + 1)%800;
 	}
 
+	printf("done\n");
 	window_destroy(window);
 	return 0;
 }
