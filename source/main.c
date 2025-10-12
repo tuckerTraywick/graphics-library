@@ -1,7 +1,5 @@
 #include <stdio.h>
 #include <unistd.h>
-#include <X11/Xlib.h>
-#include <X11/Xft/Xft.h>
 #include "graphics.h"
 
 int main(void) {

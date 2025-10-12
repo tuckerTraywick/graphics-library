@@ -8,6 +8,7 @@
 #define COLOR_WHITE 0xFFFFFFFF
 #define COLOR_BLUE 0xFF0000FF
 
+// TODO: Make opaque.
 struct window {
 	char *name;
 	unsigned int width;
