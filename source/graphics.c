@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <X11/Xlib.h>
-#include <X11/Xutil.h>
+#include <X11/Xft/Xft.h>
 #include "graphics.h"
 
 struct window *window_create(char *name, unsigned int width, unsigned int height) {
@@ -31,10 +31,13 @@ struct window *window_create(char *name, unsigned int width, unsigned int height
 	};
 	unsigned long mask = GCBackground | GCForeground | GCLineWidth | GCLineStyle;
 	window->x_context = XCreateGC(window->x_display, window->x_window, mask, &values);
+	window->xft_draw = XftDrawCreate(window->x_display, window->x_window, DefaultVisual(window->x_display, screen_number), DefaultColormap(window->x_display, screen_number));
 	return window;
 }
 
 void window_destroy(struct window *window) {
+	XftFontClose(window->x_display, window->xft_font);
+	XftDrawDestroy(window->xft_draw);
 	XDestroyWindow(window->x_display, window->x_window);
 	XCloseDisplay(window->x_display);
 	free(window);
@@ -50,12 +53,10 @@ void window_flush(struct window *window) {
 }
 
 bool window_load_font(struct window *window, char *font_name) {
-	XFontStruct *font = XLoadQueryFont(window->x_display, font_name);
-	if (!font) {
+	window->xft_font = XftFontOpenName(window->x_display, DefaultScreen(window->x_display), font_name);
+	if (!window->xft_font) {
 		return false;
 	}
-	XSetFont(window->x_display, window->x_context, font->fid);
-	// XFreeFont(window->x_display, font);
 	return true;
 }
 
@@ -82,6 +83,9 @@ void window_draw_rectangle_filled(struct window *window, unsigned long color, in
 }
 
 void window_draw_text(struct window *window, char *text, unsigned long color, int x, int y) {
-	XSetForeground(window->x_display, window->x_context, color);
-	XDrawString(window->x_display, window->x_window, window->x_context, x, y, text, strlen(text));
+	// XSetForeground(window->x_display, window->x_context, color);
+	XftColor xft_color = {0};
+	XRenderColor x_color = {.green=65535, .alpha=0xFFFF};
+	XftColorAllocValue(window->x_display, DefaultVisual(window->x_display, 0), DefaultColormap(window->x_display, 0), &x_color, &xft_color);
+	XftDrawString8(window->xft_draw, &xft_color, window->xft_font, x, y, (const FcChar8*)text, strlen(text));
 }

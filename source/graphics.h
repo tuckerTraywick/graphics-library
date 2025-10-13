@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <X11/Xlib.h>
+#include <X11/Xft/Xft.h>
 
 #define COLOR_BLACK 0x00000000
 #define COLOR_WHITE 0xFFFFFFFF
@@ -17,6 +18,8 @@ struct window {
 	Display *x_display;
 	Window x_window;
 	GC x_context;
+	XftDraw *xft_draw;
+	XftFont *xft_font;
 };
 
 struct window *window_create(char *name, unsigned int width, unsigned int height);
