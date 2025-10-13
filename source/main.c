@@ -16,7 +16,7 @@ int main(void) {
 	while (window_is_open(window)) {
 		window_fill(window, COLOR_BLACK);
 		window_draw_rectangle(window, COLOR_BLUE, 2, 10, 10, 100, 100);
-		window_draw_text(window, "hello world", COLOR_WHITE, 20, 20);
+		window_draw_text(window, "hello world", 20, 20);
 		window_flush(window);
 		usleep(1000);
 	}

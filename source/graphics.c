@@ -32,10 +32,15 @@ struct window *window_create(char *name, unsigned int width, unsigned int height
 	unsigned long mask = GCBackground | GCForeground | GCLineWidth | GCLineStyle;
 	window->x_context = XCreateGC(window->x_display, window->x_window, mask, &values);
 	window->xft_draw = XftDrawCreate(window->x_display, window->x_window, DefaultVisual(window->x_display, screen_number), DefaultColormap(window->x_display, screen_number));
+	// Allocate an xft color for text rendering.
+	XRenderColor x_color = {.red=0xFFFF, .green=0xFFFF, .blue=0xFFFF, .alpha=0xFFFF};	
+	XftColorAllocValue(window->x_display, DefaultVisual(window->x_display, screen_number), DefaultColormap(window->x_display, screen_number), &x_color, &window->xft_color);
 	return window;
 }
 
 void window_destroy(struct window *window) {
+	int screen_number = DefaultScreen(window->x_display);
+	XftColorFree(window->x_display, DefaultVisual(window->x_display, screen_number), DefaultColormap(window->x_display, screen_number), &window->xft_color);
 	XftFontClose(window->x_display, window->xft_font);
 	XftDrawDestroy(window->xft_draw);
 	XDestroyWindow(window->x_display, window->x_window);
@@ -82,10 +87,6 @@ void window_draw_rectangle_filled(struct window *window, unsigned long color, in
 	XFillRectangle(window->x_display, window->x_window, window->x_context, x, y, width, height);	
 }
 
-void window_draw_text(struct window *window, char *text, unsigned long color, int x, int y) {
-	// XSetForeground(window->x_display, window->x_context, color);
-	XftColor xft_color = {0};
-	XRenderColor x_color = {.green=65535, .alpha=0xFFFF};
-	XftColorAllocValue(window->x_display, DefaultVisual(window->x_display, 0), DefaultColormap(window->x_display, 0), &x_color, &xft_color);
-	XftDrawString8(window->xft_draw, &xft_color, window->xft_font, x, y, (const FcChar8*)text, strlen(text));
+void window_draw_text(struct window *window, char *text, int x, int y) {
+	XftDrawString8(window->xft_draw, &window->xft_color, window->xft_font, x, y, (const FcChar8*)text, strlen(text));
 }
