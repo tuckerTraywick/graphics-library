@@ -1,0 +1,12 @@
+- add a struct to represent color and wrap X's color handling
+- create event loop
+- pixels
+- circles
+- images/sprites
+- labels
+- buttons
+- sliders
+- scroll bars?
+- layout without coordinates?
+- retained mode?
+- 3d rendering?
