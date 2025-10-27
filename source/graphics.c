@@ -70,6 +70,11 @@ void window_fill(struct window *window, unsigned long color) {
 	XClearWindow(window->x_display, window->x_window);
 }
 
+void window_draw_point(struct window *window, unsigned long color, int x, int y) {
+	XSetForeground(window->x_display, window->x_context, color);
+	XDrawPoint(window->x_display, window->x_window, window->x_context, x, y);
+}
+
 void window_draw_line(struct window *window, unsigned long color, unsigned int line_width, int x1, int y1, int x2, int y2) {
 	XSetForeground(window->x_display, window->x_context, color);
 	XSetLineAttributes(window->x_display, window->x_context, line_width, LineSolid, CapButt, JoinRound);
