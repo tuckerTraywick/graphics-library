@@ -1,6 +1,7 @@
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
+#include <stdint.h>
 #include <stdbool.h>
 #include <X11/Xlib.h>
 #include <X11/Xft/Xft.h>
@@ -8,6 +9,16 @@
 #define COLOR_BLACK 0x00000000
 #define COLOR_WHITE 0xFFFFFFFF
 #define COLOR_BLUE 0xFF0000FF
+
+// union color {
+// 	struct {
+// 		uint8_t r;
+// 		uint8_t g;
+// 		uint8_t b;
+// 		uint8_t a;
+// 	};
+// 	uint32_t rgba;
+// };
 
 // TODO: Make opaque.
 struct window {
