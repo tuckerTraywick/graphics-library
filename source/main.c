@@ -3,11 +3,11 @@
 #include "graphics.h"
 
 int main(void) {
-	// struct window *window = window_create("Hello World", 800, 600);
-	// if (!window) {
-	// 	fprintf(stderr, "Couldn't create window.\n");
-	// 	return 1;
-	// }
+	struct window *window = window_create("Hello World", (struct vector2){800, 600});
+	if (!window) {
+		fprintf(stderr, "Couldn't create window.\n");
+		return 1;
+	}
 	// if (!window_load_font(window, "dejavu sans mono-20")) {
 	// 	fprintf(stderr, "Couldn't load font.\n");
 	// 	return 1;
@@ -23,7 +23,7 @@ int main(void) {
 	// 	i = (i + 1)%800;
 	// }
 
-	// printf("done\n");
-	// window_destroy(window);
+	printf("done\n");
+	window_destroy(window);
 	return 0;
 }
