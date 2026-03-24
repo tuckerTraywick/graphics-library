@@ -6,15 +6,9 @@
 #include <X11/Xlib.h>
 #include <X11/Xft/Xft.h>
 
-union pixel {
-	struct {
-		uint8_t r;
-		uint8_t g;
-		uint8_t b;
-		uint8_t a;
-	} components;
-	uint32_t rgba;
-};
+#define vec2(x, y) ((struct vector2){(x), (y)})
+
+typedef uint32_t pixel;
 
 struct vector2 {
 	uint32_t x;
@@ -23,13 +17,13 @@ struct vector2 {
 
 struct window;
 
-struct window *window_create(char *name, struct vector2 size);
+struct window *window_create(char *name, struct vector2 position, struct vector2 size);
 
 void window_destroy(struct window *window);
 
-// bool window_is_open(struct window *window);
+bool window_is_open(struct window *window);
 
-// void window_flush(struct window *window);
+void window_update(struct window *window);
 
 // // TODO: Make an unload font function?
 // bool window_load_font(struct window *window, char *font_name);

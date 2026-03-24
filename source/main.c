@@ -1,9 +1,11 @@
-#include <stdio.h>
 #include <unistd.h>
+
+
+#include <stdio.h>
 #include "graphics.h"
 
 int main(void) {
-	struct window *window = window_create("Hello World", (struct vector2){800, 600});
+	struct window *window = window_create("Hello World", vec2(0, 0), vec2(800, 600));
 	if (!window) {
 		fprintf(stderr, "Couldn't create window.\n");
 		return 1;
@@ -18,12 +20,19 @@ int main(void) {
 	// 	window_fill(window, COLOR_BLACK);
 	// 	window_draw_rectangle(window, COLOR_BLUE, 2, 10, 10, 100, 100);
 	// 	window_draw_text(window, "hello world", 50, 50);
-	// 	window_flush(window);
+	// 	window_update(window);
 	// 	usleep(1000);
 	// 	i = (i + 1)%800;
 	// }
 
-	printf("done\n");
+	while (window_is_open(window)) {
+		// respond to events
+		// clear screen
+		// draw stuff
+		window_update(window);
+	}
+
+	printf("Done.\n");
 	window_destroy(window);
 	return 0;
 }

@@ -10,16 +10,18 @@
 struct window {
 	char *name;
 	struct vector2 size;
+	bool is_open;
 	// Xlib state.
 	Display *x_display;
 	Window x_window;
 	GC x_context;
 	XftDraw *xft_draw;
+	Atom x_delete_window;
 	// XftFont *xft_font;
 	// XftColor xft_color;
 };
 
-struct window *window_create(char *name, struct vector2 size) {
+struct window *window_create(char *name, struct vector2 position, struct vector2 size) {
 	struct window *window = malloc(sizeof *window);
 	if (!window) {
 		return NULL;
@@ -27,14 +29,15 @@ struct window *window_create(char *name, struct vector2 size) {
 	*window = (struct window){
 		.name = name,
 		.size = size,
+		.is_open = true,
 	};
 
 	// Setup the X window.
 	window->x_display = XOpenDisplay(NULL);
-	window->x_window = XCreateSimpleWindow(window->x_display, XDefaultRootWindow(window->x_display), 0, 0, size.x, size.y, 0, 0, 0);
+	window->x_window = XCreateSimpleWindow(window->x_display, XDefaultRootWindow(window->x_display), (int)position.x, (int)position.y, size.x, size.y, 0, 0, 0);
 	XMapWindow(window->x_display, window->x_window);
 	
-	// Setup the X grahpics context.
+	// Setup the X graphics context.
 	int screen_number = DefaultScreen(window->x_display);
 	XGCValues values = {
 		.foreground = WhitePixel(window->x_display, screen_number),
@@ -46,6 +49,10 @@ struct window *window_create(char *name, struct vector2 size) {
 	window->x_context = XCreateGC(window->x_display, window->x_window, mask, &values);
 	window->xft_draw = XftDrawCreate(window->x_display, window->x_window, DefaultVisual(window->x_display, screen_number), DefaultColormap(window->x_display, screen_number));
 	
+	// Make it so we can detect the window being closed.
+	window->x_delete_window = XInternAtom(window->x_display, "WM_DELETE_WINDOW", False);
+	XSetWMProtocols(window->x_display, window->x_window, &window->x_delete_window, 1);
+
 	// Allocate an xft color for text rendering.
 	// XRenderColor x_color = {.red=0xFFFF, .green=0xFFFF, .blue=0xFFFF, .alpha=0xFFFF};	
 	// XftColorAllocValue(window->x_display, DefaultVisual(window->x_display, screen_number), DefaultColormap(window->x_display, screen_number), &x_color, &window->xft_color);
@@ -61,14 +68,18 @@ void window_destroy(struct window *window) {
 	free(window);
 }
 
-// bool window_is_open(struct window *window) {
-// 	XWindowAttributes attributes = {0};
-// 	return XGetWindowAttributes(window->x_display, window->x_window, &attributes) != 0;
-// }
+bool window_is_open(struct window *window) {
+	return window->is_open;
+}
 
-// void window_flush(struct window *window) {
-// 	XFlush(window->x_display);
-// }
+void window_update(struct window *window) {
+	XFlush(window->x_display);
+	XEvent event = {0};
+	XNextEvent(window->x_display, &event);
+	if (event.type == ClientMessage) {
+		window->is_open = false;
+	}
+}
 
 // bool window_load_font(struct window *window, char *font_name) {
 // 	window->xft_font = XftFontOpenName(window->x_display, DefaultScreen(window->x_display), font_name);
