@@ -6,6 +6,16 @@
 
 #define vec2(x, y) ((struct vector2){(x), (y)})
 
+#define COLOR_RED 0xFFFF0000
+
+#define COLOR_GREEN 0xFF00FF00
+
+#define COLOR_BLUE 0xFF0000FF
+
+#define COLOR_WHITE 0xFFFFFFFF
+
+#define COLOR_BLACK 0x00000000
+
 typedef uint32_t pixel;
 
 struct vector2 {

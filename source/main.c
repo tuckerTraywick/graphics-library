@@ -25,14 +25,14 @@ int main(void) {
 	// 	i = (i + 1)%800;
 	// }
 
-	for (uint32_t x = 0; x < 100; ++x) {
-		window_draw_pixel(window, vec2(x, 10), 0XFFFFFF);
-	}
 	while (window_is_open(window)) {
 		// respond to events
 		// clear screen
 		// draw stuff
-		// window_fill(window, 0xFFFFFFFF);
+		window_fill(window, COLOR_BLACK);
+		for (uint32_t x = 0; x < 100; ++x) {
+			window_draw_pixel(window, vec2(x, 20), COLOR_RED);
+		}
 		window_update(window);
 	}
  
