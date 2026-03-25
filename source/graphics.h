@@ -37,4 +37,6 @@ void window_fill(struct window *window, pixel color);
 
 void window_draw_pixel(struct window *window, struct vector2 position, pixel color);
 
+void window_draw_line_bresenham2(struct window *window, struct vector2 start, struct vector2 end, uint32_t thickness, pixel color);
+
 #endif // GRAPHICS_H

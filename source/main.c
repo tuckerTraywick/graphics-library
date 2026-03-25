@@ -11,35 +11,23 @@ int main(void) {
 		fprintf(stderr, "Couldn't create window.\n");
 		return 1;
 	}
-	// if (!window_load_font(window, "dejavu sans mono-20")) {
-	// 	fprintf(stderr, "Couldn't load font.\n");
-	// 	return 1;
-	// }
 
-	// int i = 0;
-	// while (window_is_open(window)) {
-	// 	window_fill(window, COLOR_BLACK);
-	// 	window_draw_rectangle(window, COLOR_BLUE, 2, 10, 10, 100, 100);
-	// 	window_draw_text(window, "hello world", 50, 50);
-	// 	window_update(window);
-	// 	usleep(1000);
-	// 	i = (i + 1)%800;
-	// }
-
+	uint32_t y = 0;
 	while (window_is_open(window)) {
 		struct timespec start = {0};
 		struct timespec end = {0};
-		double frame_time = 0;
 		clock_gettime(CLOCK_MONOTONIC, &start);
 
-		// respond to events
-		// clear screen
-		// draw stuff
+		// Draw stuff.
 		window_fill(window, COLOR_BLACK);
 		for (uint32_t x = 0; x < 100; ++x) {
-			window_draw_pixel(window, vec2(x, 20), COLOR_RED);
+			window_draw_pixel(window, vec2(x, y), COLOR_RED);
 		}
+		
+		// Respond to events.
 		window_update(window);
+		
+		y = (y + 1)%200;
 
 		clock_gettime(CLOCK_MONOTONIC, &end);
 		double frame_time_seconds = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) * 1e-9;

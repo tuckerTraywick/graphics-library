@@ -23,6 +23,23 @@ struct window {
 	Atom x_delete_window;
 };
 
+static void swap_uint32(uint32_t *a, uint32_t *b) {
+	uint32_t temp = *a;
+	*a = *b;
+	*b = temp;
+}
+
+// Swaps the coordinates of two vectors as needed so that the line between them points in a positive
+// x and y direction.
+static void order_vector2(struct vector2 *a, struct vector2 *b) {
+	if (a->x > b->x) {
+		swap_uint32(&a->x, &b->x);
+	}
+	if (a->y > b->y) {
+		swap_uint32(&a->y, &b->y);
+	}
+}
+
 struct window *window_create(char *name, struct vector2 position, struct vector2 size) {
 	struct window *window = malloc(sizeof *window);
 	if (!window) {
@@ -129,4 +146,9 @@ void window_fill(struct window *window, pixel color) {
 
 void window_draw_pixel(struct window *window, struct vector2 position, pixel color) {
 	window->frame_buffer[position.y*window->resolution.x + position.x] = color;
+}
+
+void window_draw_line_bresenham2(struct window *window, struct vector2 start, struct vector2 end, uint32_t thickness, pixel color) {
+	// Draw from the top left.
+	
 }
