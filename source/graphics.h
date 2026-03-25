@@ -19,8 +19,8 @@
 typedef uint32_t pixel;
 
 struct vector2 {
-	uint32_t x;
-	uint32_t y;
+	int32_t x;
+	int32_t y;
 };
 
 struct window;
@@ -35,8 +35,8 @@ void window_update(struct window *window);
 
 void window_fill(struct window *window, pixel color);
 
-void window_draw_pixel(struct window *window, struct vector2 position, pixel color);
+void window_draw_pixel2(struct window *window, struct vector2 position, pixel color);
 
-void window_draw_line_bresenham2(struct window *window, struct vector2 start, struct vector2 end, uint32_t thickness, pixel color);
+void window_draw_line2(struct window *window, struct vector2 start, struct vector2 end, uint32_t thickness, pixel color);
 
 #endif // GRAPHICS_H

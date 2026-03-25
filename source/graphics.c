@@ -7,6 +7,12 @@
 #include <X11/Xft/Xft.h>
 #include "graphics.h"
 
+#define abs(x) (((x) < 0) ? (-x) : (x))
+
+#define round(x) (((x) < 0.0f) ? (int32_t)(x - 0.5) : (int32_t)(x + 0.5f))
+
+#define max(a, b) (((a) >= (b)) ? (a) : (b))
+
 struct window {
 	char *name;
 	struct vector2 size;
@@ -22,23 +28,6 @@ struct window {
 	XImage *x_image;
 	Atom x_delete_window;
 };
-
-static void swap_uint32(uint32_t *a, uint32_t *b) {
-	uint32_t temp = *a;
-	*a = *b;
-	*b = temp;
-}
-
-// Swaps the coordinates of two vectors as needed so that the line between them points in a positive
-// x and y direction.
-static void order_vector2(struct vector2 *a, struct vector2 *b) {
-	if (a->x > b->x) {
-		swap_uint32(&a->x, &b->x);
-	}
-	if (a->y > b->y) {
-		swap_uint32(&a->y, &b->y);
-	}
-}
 
 struct window *window_create(char *name, struct vector2 position, struct vector2 size) {
 	struct window *window = malloc(sizeof *window);
@@ -137,18 +126,28 @@ void window_update(struct window *window) {
 }
 
 void window_fill(struct window *window, pixel color) {
-	for (uint32_t y = 0; y < window->size.y; ++y) {
-		for (uint32_t x = 0; x < window->size.x; ++x) {
-			window_draw_pixel(window, vec2(x, y), color);
+	for (int32_t y = 0; y < window->size.y; ++y) {
+		for (int32_t x = 0; x < window->size.x; ++x) {
+			window_draw_pixel2(window, vec2(x, y), color);
 		}
 	}
 }
 
-void window_draw_pixel(struct window *window, struct vector2 position, pixel color) {
+void window_draw_pixel2(struct window *window, struct vector2 position, pixel color) {
 	window->frame_buffer[position.y*window->resolution.x + position.x] = color;
 }
 
-void window_draw_line_bresenham2(struct window *window, struct vector2 start, struct vector2 end, uint32_t thickness, pixel color) {
-	// Draw from the top left.
-	
+// TODO: Account for line thickness.
+void window_draw_line2(struct window *window, struct vector2 start, struct vector2 end, uint32_t thickness, pixel color) {
+	struct vector2 distance = vec2(end.x - start.x, end.y - start.y);
+	uint32_t steps = max(abs(distance.x), abs(distance.y));
+	float x_increment = (float)distance.x/(float)steps;
+	float y_increment = (float)distance.y/(float)steps;
+	float x = start.x;
+	float y = start.y;
+	for (uint32_t i = 0; i < steps; ++i) {
+		window_draw_pixel2(window, vec2(round(x), round(y)), color);
+		x += x_increment;
+		y += y_increment;
+	}
 }

@@ -12,7 +12,7 @@ int main(void) {
 		return 1;
 	}
 
-	uint32_t y = 0;
+	int32_t y = 0;
 	while (window_is_open(window)) {
 		struct timespec start = {0};
 		struct timespec end = {0};
@@ -20,13 +20,10 @@ int main(void) {
 
 		// Draw stuff.
 		window_fill(window, COLOR_BLACK);
-		for (uint32_t x = 0; x < 100; ++x) {
-			window_draw_pixel(window, vec2(x, y), COLOR_RED);
-		}
+		window_draw_line2(window, vec2(100, 10), vec2(0, 0), 0, COLOR_WHITE);
 		
 		// Respond to events.
 		window_update(window);
-		
 		y = (y + 1)%200;
 
 		clock_gettime(CLOCK_MONOTONIC, &end);
