@@ -83,6 +83,14 @@ void window_destroy(struct window *window) {
 	// free(window->frame_buffer); // Not freeing the frame buffer because `XDestroyImage()` frees it.
 }
 
+struct surface window_get_surface(struct window *window) {
+	return (struct surface){
+		.size = window->size,
+		.parent_size = window->resolution,
+		.pixels = window->frame_buffer,
+	};
+}
+
 bool window_is_open(struct window *window) {
 	return window->is_open;
 }
@@ -103,20 +111,20 @@ void window_update(struct window *window) {
 	}
 }
 
-void window_fill(struct window *window, pixel color) {
-	for (int32_t y = 0; y < window->size.y; ++y) {
-		for (int32_t x = 0; x < window->size.x; ++x) {
-			window_draw_pixel2(window, vec2(x, y), color);
+void surface_fill(struct surface *surface, pixel color) {
+	for (int32_t y = 0; y < surface->size.y; ++y) {
+		for (int32_t x = 0; x < surface->size.x; ++x) {
+			surface_draw_pixel2(surface, vec2(x, y), color);
 		}
 	}
 }
 
-void window_draw_pixel2(struct window *window, struct vector2 position, pixel color) {
-	window->frame_buffer[position.y*window->resolution.x + position.x] = color;
+void surface_draw_pixel2(struct surface *surface, struct vector2 position, pixel color) {
+	surface->pixels[position.y*surface->parent_size.x + position.x] = color;
 }
 
 // TODO: Account for line thickness.
-void window_draw_line2(struct window *window, struct vector2 start, struct vector2 end, uint32_t thickness, pixel color) {
+void surface_draw_line2(struct surface *surface, struct vector2 start, struct vector2 end, uint32_t thickness, pixel color) {
 	struct vector2 distance = vec2(end.x - start.x, end.y - start.y);
 	uint32_t steps = max(abs(distance.x), abs(distance.y));
 	float x_increment = (float)distance.x/(float)steps;
@@ -124,7 +132,7 @@ void window_draw_line2(struct window *window, struct vector2 start, struct vecto
 	float x = start.x;
 	float y = start.y;
 	for (uint32_t i = 0; i < steps; ++i) {
-		window_draw_pixel2(window, vec2(round(x), round(y)), color);
+		surface_draw_pixel2(surface, vec2(round(x), round(y)), color);
 		x += x_increment;
 		y += y_increment;
 	}
@@ -132,21 +140,19 @@ void window_draw_line2(struct window *window, struct vector2 start, struct vecto
 
 // TODO: Account for line thickness. Currently the corners will be choppy if the border is too
 // thick.
-void window_draw_rectangle2(struct window *window, struct vector2 position, struct vector2 size, uint32_t thickness, pixel color) {
+void surface_draw_rectangle2(struct surface *surface, struct vector2 position, struct vector2 size, uint32_t thickness, pixel color) {
 	struct vector2 top_right = vec2(position.x + size.x, position.y);
 	struct vector2 bottom_left = vec2(position.x, position.y + size.y);
 	struct vector2 bottom_right = vec2(position.x + size.x, position.y + size.y);
-	window_draw_line2(window, position, top_right, thickness, color);
-	window_draw_line2(window, position, bottom_left, thickness, color);
-	window_draw_line2(window, bottom_left, bottom_right, thickness, color);
-	window_draw_line2(window, bottom_right, top_right, thickness, color);
+	surface_draw_line2(surface, position, top_right, thickness, color);
+	surface_draw_line2(surface, position, bottom_left, thickness, color);
+	surface_draw_line2(surface, bottom_left, bottom_right, thickness, color);
+	surface_draw_line2(surface, bottom_right, top_right, thickness, color);
 }
 
-void window_draw_rectangle_filled2(struct window *window, struct vector2 position, struct vector2 size, uint32_t border_thickness, pixel border_color, pixel fill_color) {
-	window_draw_rectangle2(window, position, size, border_thickness, border_color);
+void surface_draw_rectangle_filled2(struct surface *surface, struct vector2 position, struct vector2 size, uint32_t border_thickness, pixel border_color, pixel fill_color) {
+	surface_draw_rectangle2(surface, position, size, border_thickness, border_color);
 	for (int32_t y = position.y + border_thickness; y < position.y + size.y; ++y) {
-		window_draw_line2(window, vec2(position.x + border_thickness, y), vec2(position.x + size.x, y), 1, fill_color);
+		surface_draw_line2(surface, vec2(position.x + border_thickness, y), vec2(position.x + size.x, y), 1, fill_color);
 	}
 }
-
-

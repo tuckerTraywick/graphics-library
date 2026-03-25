@@ -11,6 +11,7 @@ int main(void) {
 		fprintf(stderr, "Couldn't create window.\n");
 		return 1;
 	}
+	struct surface surface = window_get_surface(&window);
 
 	int32_t y = 0;
 	while (window_is_open(&window)) {
@@ -19,8 +20,8 @@ int main(void) {
 		clock_gettime(CLOCK_MONOTONIC, &start);
 
 		// Draw stuff.
-		window_fill(&window, COLOR_BLACK);
-		window_draw_rectangle_filled2(&window, vec2(100, 100), vec2(100, 100), 1, COLOR_WHITE, COLOR_RED);
+		surface_fill(&surface, COLOR_BLACK);
+		surface_draw_rectangle_filled2(&surface, vec2(100, 100), vec2(100, 100), 1, COLOR_WHITE, COLOR_RED);
 		
 		// Respond to events.
 		window_update(&window);
