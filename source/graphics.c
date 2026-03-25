@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#include <stddef.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <X11/Xlib.h>
@@ -9,6 +10,7 @@
 struct window {
 	char *name;
 	struct vector2 size;
+	struct vector2 resolution;
 	bool is_open;
 	pixel *frame_buffer;
 
@@ -39,29 +41,19 @@ struct window *window_create(char *name, struct vector2 position, struct vector2
 	window->x_window = XCreateSimpleWindow(window->x_display, XDefaultRootWindow(window->x_display), (int)position.x, (int)position.y, size.x, size.y, 0, 0, 0);
 	XMapWindow(window->x_display, window->x_window);
 	int default_screen = DefaultScreen(window->x_display);
-	int display_width =	DisplayWidth(window->x_display, default_screen);
-	int display_height = DisplayHeight(window->x_display, default_screen);
 	int default_depth = DefaultDepth(window->x_display, default_screen);
 	Visual *default_visual = DefaultVisual(window->x_display, default_screen);
+	window->resolution = vec2(DisplayWidth(window->x_display, default_screen), DisplayHeight(window->x_display, default_screen));
 
 	// Allocate the framebuffer.
-	window->frame_buffer = malloc(display_width*display_height*sizeof *window->frame_buffer);
+	window->frame_buffer = calloc(window->resolution.x*window->resolution.y, sizeof *window->frame_buffer);
 	if (!window->frame_buffer) {
 		goto error1;
 	}
 
 	// Setup the XImage.
 	window->x_image = XCreateImage(
-		window->x_display,
-		default_visual,
-		default_depth,
-		ZPixmap,
-		0,
-		(char*)window->frame_buffer,
-		display_width,
-		display_height,
-		32,
-		0
+		window->x_display, default_visual, default_depth, ZPixmap, 0, (char*)window->frame_buffer, window->resolution.x, window->resolution.y, 32, 0
 	);
 	if (!window->x_image) {
 		goto error2;
@@ -117,6 +109,7 @@ bool window_is_open(struct window *window) {
 }
 
 void window_update(struct window *window) {
+	XPutImage(window->x_display, window->x_window, window->x_context, window->x_image, 0, 0, 0, 0, window->size.x, window->size.y);
 	XFlush(window->x_display);
 	XEvent event = {0};
 	XNextEvent(window->x_display, &event);
@@ -125,8 +118,14 @@ void window_update(struct window *window) {
 	}
 }
 
-void window_draw_pixel(struct window *window, struct vector2 position, pixel color) {
+void window_fill(struct window *window, pixel color) {
+	for (size_t i = 0; i < window->size.x*window->size.y; ++i) {
+		window->frame_buffer[i] = color;
+	}
+}
 
+void window_draw_pixel(struct window *window, struct vector2 position, pixel color) {
+	window->frame_buffer[position.y*window->resolution.x + position.x] = color;
 }
 
 // bool window_load_font(struct window *window, char *font_name) {

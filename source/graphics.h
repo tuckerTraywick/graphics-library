@@ -23,6 +23,8 @@ bool window_is_open(struct window *window);
 
 void window_update(struct window *window);
 
+void window_fill(struct window *window, pixel color);
+
 void window_draw_pixel(struct window *window, struct vector2 position, pixel color);
 
 #endif // GRAPHICS_H
