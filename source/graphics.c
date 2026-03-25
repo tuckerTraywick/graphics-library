@@ -13,86 +13,65 @@
 
 #define max(a, b) (((a) >= (b)) ? (a) : (b))
 
-struct window {
-	char *name;
-	struct vector2 size;
-	struct vector2 resolution;
-	bool is_open;
-	pixel *frame_buffer;
-
-	// Xlib state.
-	Display *x_display;
-	Window x_window;
-	GC x_context;
-	XftDraw *xft_draw;
-	XImage *x_image;
-	Atom x_delete_window;
-};
-
-struct window *window_create(char *name, struct vector2 position, struct vector2 size) {
-	struct window *window = malloc(sizeof *window);
-	if (!window) {
-		return NULL;
-	}
-	*window = (struct window){
+struct window window_create(char *name, struct vector2 position, struct vector2 size) {
+	struct window window = {
 		.name = name,
 		.size = size,
 		.is_open = true,
 	};
 
 	// Setup the X window.
-	window->x_display = XOpenDisplay(NULL);
-	window->x_window = XCreateSimpleWindow(window->x_display, XDefaultRootWindow(window->x_display), (int)position.x, (int)position.y, size.x, size.y, 0, 0, 0);
-	XMapWindow(window->x_display, window->x_window);
-	int default_screen = DefaultScreen(window->x_display);
-	int default_depth = DefaultDepth(window->x_display, default_screen);
-	Visual *default_visual = DefaultVisual(window->x_display, default_screen);
-	window->resolution = vec2(DisplayWidth(window->x_display, default_screen), DisplayHeight(window->x_display, default_screen));
+	window.x_display = XOpenDisplay(NULL);
+	window.x_window = XCreateSimpleWindow(window.x_display, XDefaultRootWindow(window.x_display), (int)position.x, (int)position.y, size.x, size.y, 0, 0, 0);
+	XMapWindow(window.x_display, window.x_window);
+	int default_screen = DefaultScreen(window.x_display);
+	int default_depth = DefaultDepth(window.x_display, default_screen);
+	Visual *default_visual = DefaultVisual(window.x_display, default_screen);
+	window.resolution = vec2(DisplayWidth(window.x_display, default_screen), DisplayHeight(window.x_display, default_screen));
 
 	// Allocate the framebuffer.
-	window->frame_buffer = calloc(window->resolution.x*window->resolution.y, sizeof *window->frame_buffer);
-	if (!window->frame_buffer) {
+	window.frame_buffer = calloc(window.resolution.x*window.resolution.y, sizeof *window.frame_buffer);
+	if (!window.frame_buffer) {
 		goto error1;
 	}
 
 	// Setup the XImage.
-	window->x_image = XCreateImage(
-		window->x_display, default_visual, default_depth, ZPixmap, 0, (char*)window->frame_buffer, window->resolution.x, window->resolution.y, 32, 0
+	window.x_image = XCreateImage(
+		window.x_display, default_visual, default_depth, ZPixmap, 0, (char*)window.frame_buffer, window.resolution.x, window.resolution.y, 32, 0
 	);
-	if (!window->x_image) {
+	if (!window.x_image) {
 		goto error2;
 	}
 
 	// Setup the X graphics context.
 	XGCValues values = {
-		.foreground = WhitePixel(window->x_display, default_screen),
-		.background = BlackPixel(window->x_display, default_screen),
+		.foreground = WhitePixel(window.x_display, default_screen),
+		.background = BlackPixel(window.x_display, default_screen),
 		.line_width = 1,
 		.line_style = LineSolid,
 	};
 	unsigned long mask = GCBackground | GCForeground | GCLineWidth | GCLineStyle;
-	window->x_context = XCreateGC(window->x_display, window->x_window, mask, &values);
-	window->xft_draw = XftDrawCreate(window->x_display, window->x_window, DefaultVisual(window->x_display, default_screen), DefaultColormap(window->x_display, default_screen));
+	window.x_context = XCreateGC(window.x_display, window.x_window, mask, &values);
+	window.xft_draw = XftDrawCreate(window.x_display, window.x_window, DefaultVisual(window.x_display, default_screen), DefaultColormap(window.x_display, default_screen));
 
 	// Make it so we can detect the window being closed.
-	window->x_delete_window = XInternAtom(window->x_display, "WM_DELETE_WINDOW", False);
-	if (!XSetWMProtocols(window->x_display, window->x_window, &window->x_delete_window, 1)) {
+	window.x_delete_window = XInternAtom(window.x_display, "WM_DELETE_WINDOW", False);
+	if (!XSetWMProtocols(window.x_display, window.x_window, &window.x_delete_window, 1)) {
 		goto error3;
 	}
 
 	return window;
 
 error3:
-	XDestroyImage(window->x_image);
-	XftDrawDestroy(window->xft_draw);
-	XFreeGC(window->x_display, window->x_context);
+	XDestroyImage(window.x_image);
+	XftDrawDestroy(window.xft_draw);
+	XFreeGC(window.x_display, window.x_context);
 error2:
-	free(window->frame_buffer);
+	free(window.frame_buffer);
 error1:
-	XDestroyWindow(window->x_display, window->x_window);
-	XCloseDisplay(window->x_display);
-	free(window);
-	return NULL;
+	XDestroyWindow(window.x_display, window.x_window);
+	XCloseDisplay(window.x_display);
+	return (struct window){0};
 }
 
 void window_destroy(struct window *window) {
@@ -170,3 +149,5 @@ void window_draw_rectangle_filled2(struct window *window, struct vector2 positio
 		window_draw_line2(window, vec2(position.x + border_thickness, y), vec2(position.x + size.x, y), 1, fill_color);
 	}
 }
+
+

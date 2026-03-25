@@ -1,13 +1,3 @@
-- add a struct to represent color and wrap X's color handling
-- create event loop
-- circles
-- images/sprites
-- labels
-- buttons
-- sliders
-- scroll bars?
-- layout without coordinates?
-- retained mode?
-- 3d rendering?
+- Sprite drawing and subsprites/atlases
+- Make line drawing support thickness/AA and make it faster
 
-X pixels
