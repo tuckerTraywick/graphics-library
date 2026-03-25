@@ -20,7 +20,7 @@ int main(void) {
 
 		// Draw stuff.
 		window_fill(window, COLOR_BLACK);
-		window_draw_line2(window, vec2(100, 10), vec2(0, 0), 0, COLOR_WHITE);
+		window_draw_rectangle2(window, vec2(y, y), vec2(100, 100), 0, COLOR_WHITE);
 		
 		// Respond to events.
 		window_update(window);
@@ -28,7 +28,7 @@ int main(void) {
 
 		clock_gettime(CLOCK_MONOTONIC, &end);
 		double frame_time_seconds = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) * 1e-9;
-		printf("frame time = %f, frame rate = %f\n", frame_time_seconds, 1.0/frame_time_seconds);
+		// printf("frame time = %f, frame rate = %f\n", frame_time_seconds, 1.0/frame_time_seconds);
 	}
  
 	printf("Done.\n");

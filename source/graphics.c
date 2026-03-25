@@ -151,3 +151,14 @@ void window_draw_line2(struct window *window, struct vector2 start, struct vecto
 		y += y_increment;
 	}
 }
+
+// TODO: Account for line thickness.
+void window_draw_rectangle2(struct window *window, struct vector2 position, struct vector2 size, uint32_t thickness, pixel color) {
+	struct vector2 top_right = vec2(position.x + size.x, position.y);
+	struct vector2 bottom_left = vec2(position.x, position.y + size.y);
+	struct vector2 bottom_right = vec2(position.x + size.x, position.y + size.y);
+	window_draw_line2(window, position, top_right, thickness, color);
+	window_draw_line2(window, position, bottom_left, thickness, color);
+	window_draw_line2(window, bottom_left, bottom_right, thickness, color);
+	window_draw_line2(window, bottom_right, top_right, thickness, color);
+}
