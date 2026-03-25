@@ -81,7 +81,6 @@ void window_destroy(struct window *window) {
 	XDestroyWindow(window->x_display, window->x_window);
 	XCloseDisplay(window->x_display);
 	// free(window->frame_buffer); // Not freeing the frame buffer because `XDestroyImage()` frees it.
-	free(window);
 }
 
 bool window_is_open(struct window *window) {
