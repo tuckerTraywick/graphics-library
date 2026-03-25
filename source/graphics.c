@@ -83,8 +83,8 @@ void surface_draw_line2(struct surface *surface, struct vector2 start, struct ve
 	float y_increment = (float)distance.y/(float)steps;
 	float x = start.x;
 	float y = start.y;
-	for (uint32_t i = 0; i < steps; ++i) {
-		surface_set_pixel(surface, vec2(round(x), round(y)), color);
+	for (uint32_t i = 0; i <= steps; ++i) {
+		surface_set_pixel(surface, vec2(x, y), color);
 		x += x_increment;
 		y += y_increment;
 	}
@@ -114,7 +114,7 @@ void surface_draw_surface2(struct surface *surface, struct surface *sprite, stru
 	float scale_y = (float)sprite->size.y/(float)size.y;
 	for (int32_t offset_y = 0; offset_y < size.y; ++offset_y) {
 		for (int32_t offset_x = 0; offset_x < size.x; ++offset_x) {
-			struct vector2 sprite_position = vec2(round((float)offset_x*scale_x), round((float)offset_y*scale_y));
+			struct vector2 sprite_position = vec2((float)offset_x*scale_x, (float)offset_y*scale_y);
 			struct vector2 surface_position = vec2(position.x + offset_x, position.y + offset_y);
 			surface_set_pixel(surface, surface_position, surface_get_pixel(sprite, sprite_position));
 		}

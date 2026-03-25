@@ -1,3 +1,4 @@
 - Make line drawing support thickness/AA and make it faster
+- Sprite rotation
 
 X Sprite drawing

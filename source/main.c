@@ -18,7 +18,7 @@ int main(void) {
 	// surface_draw_rectangle_filled2(&sprite, vec2(0, 0), vec2(200, 200), 1, COLOR_WHITE, COLOR_RED);
 	surface_draw_line2(&sprite, vec2(0, 0), vec2(99, 99), 1, COLOR_WHITE);
 	surface_draw_line2(&sprite, vec2(99, 0), vec2(0, 99), 1, COLOR_WHITE);
-	printf("pixel = %d\n", surface_get_pixel(&sprite, vec2(98, 0)));
+	printf("pixel = %X\n", surface_get_pixel(&sprite, vec2(0, 99)));
 
 	int32_t y = 0;
 	while (window_is_open(&window)) {
@@ -41,6 +41,9 @@ int main(void) {
 		// printf("frame time = %f, frame rate = %f\n", frame_time_seconds, 1.0/frame_time_seconds);
 	}
  
+
+	surface_destroy(&sprite);
+
 	printf("Done.\n");
 	window_destroy(&window);
 	return 0;
