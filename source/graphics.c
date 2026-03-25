@@ -9,9 +9,117 @@
 
 #define abs(x) (((x) < 0) ? (-x) : (x))
 
-#define round(x) (((x) < 0.0f) ? (int32_t)(x - 0.5) : (int32_t)(x + 0.5f))
+#define round(x) (((x) < 0.0f) ? (int32_t)(x - 0.5f) : (int32_t)(x + 0.5f))
 
 #define max(a, b) (((a) >= (b)) ? (a) : (b))
+
+struct surface surface_create(struct vector2 size) {
+	struct surface surface = {
+		.size = size,
+		.pixels = calloc(size.x*size.y, sizeof *surface.pixels),
+	};
+	if (!surface.pixels) {
+		return (struct surface){0};
+	}
+	return surface;
+}
+
+struct surface surface_create_with_pixels(pixel *pixels, struct vector2 size) {
+	return (struct surface){
+		.size = size,
+		.pixels = pixels,
+	};
+}
+
+void surface_destroy(struct surface *surface) {
+	free(surface->pixels);
+	*surface = (struct surface){0};
+}
+
+struct surface surface_get_subsurface(struct surface *surface, struct vector2 offset, struct vector2 size) {
+	return (struct surface){
+		.size = size,
+		.parent_size = surface->size,
+		.offset = offset,
+		.pixels = surface->pixels,
+	};
+}
+
+pixel surface_get_pixel(struct surface *surface, struct vector2 position) {
+	if (surface->parent_size.x) {
+		return surface->pixels[(position.y + surface->offset.y)*surface->parent_size.x + position.x + surface->offset.x];
+	}
+	return surface->pixels[position.y*surface->size.x + position.x];
+}
+
+void surface_set_pixel(struct surface *surface, struct vector2 position, pixel color) {
+	if (position.x >= surface->size.x || position.y >= surface->size.y) {
+		return;
+	}
+	if (surface->parent_size.x) {
+		surface->pixels[(position.y + surface->offset.y)*surface->parent_size.x + position.x + surface->offset.x] = color;
+		return;
+	}
+	surface->pixels[position.y*surface->size.x + position.x] = color;
+}
+
+bool surface_is_valid(struct surface *surface) {
+	return surface->pixels != NULL;
+}
+
+void surface_fill(struct surface *surface, pixel color) {
+	for (int32_t y = 0; y < surface->size.y; ++y) {
+		for (int32_t x = 0; x < surface->size.x; ++x) {
+			surface_set_pixel(surface, vec2(x, y), color);
+		}
+	}
+}
+
+// TODO: Account for line thickness.
+void surface_draw_line2(struct surface *surface, struct vector2 start, struct vector2 end, uint32_t thickness, pixel color) {
+	struct vector2 distance = vec2(end.x - start.x, end.y - start.y);
+	uint32_t steps = max(abs(distance.x), abs(distance.y));
+	float x_increment = (float)distance.x/(float)steps;
+	float y_increment = (float)distance.y/(float)steps;
+	float x = start.x;
+	float y = start.y;
+	for (uint32_t i = 0; i < steps; ++i) {
+		surface_set_pixel(surface, vec2(round(x), round(y)), color);
+		x += x_increment;
+		y += y_increment;
+	}
+}
+
+// TODO: Account for line thickness. Currently the corners will be choppy if the border is too
+// thick.
+void surface_draw_rectangle2(struct surface *surface, struct vector2 position, struct vector2 size, uint32_t thickness, pixel color) {
+	struct vector2 top_right = vec2(position.x + size.x - 1, position.y);
+	struct vector2 bottom_left = vec2(position.x, position.y + size.y - 1);
+	struct vector2 bottom_right = vec2(position.x + size.x - 1, position.y + size.y - 1);
+	surface_draw_line2(surface, position, top_right, thickness, color);
+	surface_draw_line2(surface, position, bottom_left, thickness, color);
+	surface_draw_line2(surface, bottom_left, bottom_right, thickness, color);
+	surface_draw_line2(surface, bottom_right, top_right, thickness, color);
+}
+
+void surface_draw_rectangle_filled2(struct surface *surface, struct vector2 position, struct vector2 size, uint32_t border_thickness, pixel border_color, pixel fill_color) {
+	surface_draw_rectangle2(surface, position, size, border_thickness, border_color);
+	for (int32_t y = position.y + border_thickness; y < position.y + size.y - border_thickness; ++y) {
+		surface_draw_line2(surface, vec2(position.x + border_thickness, y), vec2(position.x + size.x - border_thickness, y), 1, fill_color);
+	}
+}
+
+void surface_draw_surface2(struct surface *surface, struct surface *sprite, struct vector2 position, struct vector2 size) {
+	float scale_x = (float)sprite->size.x/(float)size.x;
+	float scale_y = (float)sprite->size.y/(float)size.y;
+	for (int32_t offset_y = 0; offset_y < size.y; ++offset_y) {
+		for (int32_t offset_x = 0; offset_x < size.x; ++offset_x) {
+			struct vector2 sprite_position = vec2(round((float)offset_x*scale_x), round((float)offset_y*scale_y));
+			struct vector2 surface_position = vec2(position.x + offset_x, position.y + offset_y);
+			surface_set_pixel(surface, surface_position, surface_get_pixel(sprite, sprite_position));
+		}
+	}
+}
 
 struct window window_create(char *name, struct vector2 position, struct vector2 size) {
 	struct window window = {
@@ -108,51 +216,5 @@ void window_update(struct window *window) {
 	XNextEvent(window->x_display, &event); // Blocks.
 	if (event.type == ClientMessage) {
 		window->is_open = false;
-	}
-}
-
-void surface_fill(struct surface *surface, pixel color) {
-	for (int32_t y = 0; y < surface->size.y; ++y) {
-		for (int32_t x = 0; x < surface->size.x; ++x) {
-			surface_draw_pixel2(surface, vec2(x, y), color);
-		}
-	}
-}
-
-void surface_draw_pixel2(struct surface *surface, struct vector2 position, pixel color) {
-	surface->pixels[position.y*surface->parent_size.x + position.x] = color;
-}
-
-// TODO: Account for line thickness.
-void surface_draw_line2(struct surface *surface, struct vector2 start, struct vector2 end, uint32_t thickness, pixel color) {
-	struct vector2 distance = vec2(end.x - start.x, end.y - start.y);
-	uint32_t steps = max(abs(distance.x), abs(distance.y));
-	float x_increment = (float)distance.x/(float)steps;
-	float y_increment = (float)distance.y/(float)steps;
-	float x = start.x;
-	float y = start.y;
-	for (uint32_t i = 0; i < steps; ++i) {
-		surface_draw_pixel2(surface, vec2(round(x), round(y)), color);
-		x += x_increment;
-		y += y_increment;
-	}
-}
-
-// TODO: Account for line thickness. Currently the corners will be choppy if the border is too
-// thick.
-void surface_draw_rectangle2(struct surface *surface, struct vector2 position, struct vector2 size, uint32_t thickness, pixel color) {
-	struct vector2 top_right = vec2(position.x + size.x, position.y);
-	struct vector2 bottom_left = vec2(position.x, position.y + size.y);
-	struct vector2 bottom_right = vec2(position.x + size.x, position.y + size.y);
-	surface_draw_line2(surface, position, top_right, thickness, color);
-	surface_draw_line2(surface, position, bottom_left, thickness, color);
-	surface_draw_line2(surface, bottom_left, bottom_right, thickness, color);
-	surface_draw_line2(surface, bottom_right, top_right, thickness, color);
-}
-
-void surface_draw_rectangle_filled2(struct surface *surface, struct vector2 position, struct vector2 size, uint32_t border_thickness, pixel border_color, pixel fill_color) {
-	surface_draw_rectangle2(surface, position, size, border_thickness, border_color);
-	for (int32_t y = position.y + border_thickness; y < position.y + size.y; ++y) {
-		surface_draw_line2(surface, vec2(position.x + border_thickness, y), vec2(position.x + size.x, y), 1, fill_color);
 	}
 }

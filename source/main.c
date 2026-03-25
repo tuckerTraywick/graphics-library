@@ -13,6 +13,13 @@ int main(void) {
 	}
 	struct surface surface = window_get_surface(&window);
 
+	struct surface sprite = surface_create(vec2(100, 100));
+	surface_fill(&sprite, COLOR_RED);
+	// surface_draw_rectangle_filled2(&sprite, vec2(0, 0), vec2(200, 200), 1, COLOR_WHITE, COLOR_RED);
+	surface_draw_line2(&sprite, vec2(0, 0), vec2(99, 99), 1, COLOR_WHITE);
+	surface_draw_line2(&sprite, vec2(99, 0), vec2(0, 99), 1, COLOR_WHITE);
+	printf("pixel = %d\n", surface_get_pixel(&sprite, vec2(98, 0)));
+
 	int32_t y = 0;
 	while (window_is_open(&window)) {
 		struct timespec start = {0};
@@ -20,8 +27,10 @@ int main(void) {
 		clock_gettime(CLOCK_MONOTONIC, &start);
 
 		// Draw stuff.
-		surface_fill(&surface, COLOR_BLACK);
-		surface_draw_rectangle_filled2(&surface, vec2(100, 100), vec2(100, 100), 1, COLOR_WHITE, COLOR_RED);
+		surface_fill(&surface, COLOR_BLUE);
+		// surface_draw_rectangle2(&surface, vec2(100, 100), vec2(100, 100), 1, COLOR_RED);//, COLOR_RED);
+		// surface_draw_line2(&surface, vec2(100, 200), vec2(200, 100), 1, COLOR_WHITE);
+		surface_draw_surface2(&surface, &sprite, vec2(100, 100), vec2(400, 400));
 		
 		// Respond to events.
 		window_update(&window);

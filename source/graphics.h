@@ -14,7 +14,7 @@
 
 #define COLOR_WHITE 0xFFFFFFFF
 
-#define COLOR_BLACK 0x00000000
+#define COLOR_BLACK 0xFF000000
 
 #define COLOR_RED 0xFFFF0000
 
@@ -52,23 +52,36 @@ struct window {
 	Atom x_delete_window;
 };
 
-struct surface surface_create(struct vector2 size, pixel fill_color);
+// You must call `surface_is_valid()` on the result of this function to make sure initialization was
+// successful and `surface_destroy()` when you are done with it.
+struct surface surface_create(struct vector2 size);
 
-struct surface surface_create_with_pixels(struct vector2 size, pixel *pixels);
+// Creates a new surface with the given pixels. Lets the user decide how to allocate pixels. You do
+// NOT have to call `surface_is_valid()` or `surface_destroy()` on the result of this function.
+struct surface surface_create_with_pixels(pixel *pixels, struct vector2 size);
 
+// Only call this on surfaces created with `surface_create()`.
 void surface_destroy(struct surface *surface);
 
 struct surface surface_get_subsurface(struct surface *surface, struct vector2 offset, struct vector2 size);
 
-void surface_fill(struct surface *surface, pixel color);
+pixel surface_get_pixel(struct surface *surface, struct vector2 position);
 
-void surface_draw_pixel2(struct surface *surface, struct vector2 position, pixel color);
+void surface_set_pixel(struct surface *surface, struct vector2 position, pixel color);
+
+// Returns true if the given surface has been successfully initialized.
+bool surface_is_valid(struct surface *surface);
+
+void surface_fill(struct surface *surface, pixel color);
 
 void surface_draw_line2(struct surface *surface, struct vector2 start, struct vector2 end, uint32_t thickness, pixel color);
 
 void surface_draw_rectangle2(struct surface *surface, struct vector2 position, struct vector2 size, uint32_t thickness, pixel color);
 
 void surface_draw_rectangle_filled2(struct surface *surface, struct vector2 position, struct vector2 size, uint32_t border_thickness, pixel border_color, pixel fill_color);
+
+// Scales `sprite` to fit `size`.
+void surface_draw_surface2(struct surface *surface, struct surface *sprite, struct vector2 position, struct vector2 size);
 
 struct window window_create(char *name, struct vector2 position, struct vector2 size);
 
