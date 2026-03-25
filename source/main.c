@@ -40,6 +40,10 @@ int main(void) {
 			window_draw_pixel(window, vec2(x, 20), COLOR_RED);
 		}
 		window_update(window);
+
+		clock_gettime(CLOCK_MONOTONIC, &end);
+		double frame_time_seconds = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) * 1e-9;
+		printf("frame time = %f, frame rate = %f\n", frame_time_seconds, 1.0/frame_time_seconds);
 	}
  
 	printf("Done.\n");

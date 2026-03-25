@@ -104,10 +104,16 @@ bool window_is_open(struct window *window) {
 }
 
 void window_update(struct window *window) {
+	// Display the framebuffer.
 	XPutImage(window->x_display, window->x_window, window->x_context, window->x_image, 0, 0, 0, 0, window->size.x, window->size.y);
 	XFlush(window->x_display);
+
+	// Check for events.
+	if (!XPending(window->x_display)) {
+		return;
+	}
 	XEvent event = {0};
-	XNextEvent(window->x_display, &event);
+	XNextEvent(window->x_display, &event); // Blocks.
 	if (event.type == ClientMessage) {
 		window->is_open = false;
 	}
