@@ -152,7 +152,8 @@ void window_draw_line2(struct window *window, struct vector2 start, struct vecto
 	}
 }
 
-// TODO: Account for line thickness.
+// TODO: Account for line thickness. Currently the corners will be choppy if the border is too
+// thick.
 void window_draw_rectangle2(struct window *window, struct vector2 position, struct vector2 size, uint32_t thickness, pixel color) {
 	struct vector2 top_right = vec2(position.x + size.x, position.y);
 	struct vector2 bottom_left = vec2(position.x, position.y + size.y);
@@ -161,4 +162,11 @@ void window_draw_rectangle2(struct window *window, struct vector2 position, stru
 	window_draw_line2(window, position, bottom_left, thickness, color);
 	window_draw_line2(window, bottom_left, bottom_right, thickness, color);
 	window_draw_line2(window, bottom_right, top_right, thickness, color);
+}
+
+void window_draw_rectangle_filled2(struct window *window, struct vector2 position, struct vector2 size, uint32_t border_thickness, pixel border_color, pixel fill_color) {
+	window_draw_rectangle2(window, position, size, border_thickness, border_color);
+	for (int32_t y = position.y + border_thickness; y < position.y + size.y; ++y) {
+		window_draw_line2(window, vec2(position.x + border_thickness, y), vec2(position.x + size.x, y), 1, fill_color);
+	}
 }

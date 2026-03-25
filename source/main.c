@@ -20,7 +20,7 @@ int main(void) {
 
 		// Draw stuff.
 		window_fill(window, COLOR_BLACK);
-		window_draw_rectangle2(window, vec2(y, y), vec2(100, 100), 0, COLOR_WHITE);
+		window_draw_rectangle_filled2(window, vec2(100, 100), vec2(100, 100), 1, COLOR_WHITE, COLOR_RED);
 		
 		// Respond to events.
 		window_update(window);
