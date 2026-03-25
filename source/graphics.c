@@ -114,8 +114,10 @@ void window_update(struct window *window) {
 }
 
 void window_fill(struct window *window, pixel color) {
-	for (size_t i = 0; i < window->resolution.x*window->resolution.y; ++i) {
-		window->frame_buffer[i] = color;
+	for (uint32_t y = 0; y < window->size.y; ++y) {
+		for (uint32_t x = 0; x < window->size.x; ++x) {
+			window_draw_pixel(window, vec2(x, y), color);
+		}
 	}
 }
 

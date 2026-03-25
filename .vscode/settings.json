@@ -2,5 +2,6 @@
 	"files.associations": {
 		"stdio.h": "c",
 		"xlib.h": "c"
-	}
+	},
+	"C_Cpp.default.compilerPath": "/usr/sbin/gcc"
 }

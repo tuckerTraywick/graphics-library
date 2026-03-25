@@ -1,5 +1,6 @@
+#define POSIX_C_SOURCE 200809L
 #include <unistd.h>
-
+#include <time.h>
 
 #include <stdio.h>
 #include "graphics.h"
@@ -26,6 +27,11 @@ int main(void) {
 	// }
 
 	while (window_is_open(window)) {
+		struct timespec start = {0};
+		struct timespec end = {0};
+		double frame_time = 0;
+		clock_gettime(CLOCK_MONOTONIC, &start);
+
 		// respond to events
 		// clear screen
 		// draw stuff

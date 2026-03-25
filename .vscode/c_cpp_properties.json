@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "/home/tucker/code/graphics-library/**"
+            ],
+            "defines": [],
+            "cStandard": "gnu99",
+            "cppStandard": "c++98",
+            "intelliSenseMode": "linux-gcc-x64",
+            // "compilerPathInCppPropertiesJson": "/usr/sbin/gcc",
+            "mergeConfigurations": false,
+            "recursiveIncludes": {},
+            "compilerPath": "/usr/sbin/gcc",
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true
+            }
+        }
+    ],
+    "version": 4
+}
