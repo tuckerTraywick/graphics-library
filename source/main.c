@@ -31,7 +31,7 @@ int main(void) {
 		// draw stuff
 		window_update(window);
 	}
-
+ 
 	printf("Done.\n");
 	window_destroy(window);
 	return 0;
