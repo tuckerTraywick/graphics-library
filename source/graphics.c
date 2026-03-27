@@ -84,7 +84,7 @@ void surface_draw_line2(struct surface *surface, struct vector2 start, struct ve
 	float x = start.x;
 	float y = start.y;
 	for (uint32_t i = 0; i <= steps; ++i) {
-		surface_set_pixel(surface, vec2(x, y), color);
+		surface_set_pixel(surface, vec2(round(x), round(y)), color);
 		x += x_increment;
 		y += y_increment;
 	}
@@ -110,13 +110,13 @@ void surface_draw_rectangle_filled2(struct surface *surface, struct vector2 posi
 }
 
 void surface_draw_surface2(struct surface *surface, struct surface *sprite, struct vector2 position, struct vector2 size) {
-	float scale_x = (float)sprite->size.x/(float)size.x;
-	float scale_y = (float)sprite->size.y/(float)size.y;
-	for (int32_t offset_y = 0; offset_y < size.y; ++offset_y) {
-		for (int32_t offset_x = 0; offset_x < size.x; ++offset_x) {
-			struct vector2 sprite_position = vec2((float)offset_x*scale_x, (float)offset_y*scale_y);
-			struct vector2 surface_position = vec2(position.x + offset_x, position.y + offset_y);
-			surface_set_pixel(surface, surface_position, surface_get_pixel(sprite, sprite_position));
+	for (int32_t surface_y = position.y; surface_y < position.y + size.y; ++surface_y) {
+		for (int32_t surface_x = position.x; surface_x < position.x + size.x; ++surface_x) {
+			float u = (float)(surface_x - position.x)/(float)size.x;
+			float v = (float)(surface_y - position.y)/(float)size.y;
+			int32_t sprite_x = round(u*(float)sprite->size.x);
+			int32_t sprite_y = round(v*(float)sprite->size.y);
+			surface_set_pixel(surface, vec2(surface_x, surface_y), surface_get_pixel(sprite, vec2(sprite_x, sprite_y)));
 		}
 	}
 }
