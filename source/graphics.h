@@ -67,7 +67,8 @@ struct surface surface_get_subsurface(struct surface *surface, struct vector2 of
 
 pixel surface_get_pixel(struct surface *surface, struct vector2 position);
 
-void surface_set_pixel(struct surface *surface, struct vector2 position, pixel color);
+// Returns true if `position` lies inside of `surface`.
+bool surface_set_pixel(struct surface *surface, struct vector2 position, pixel color);
 
 // Returns true if the given surface has been successfully initialized.
 bool surface_is_valid(struct surface *surface);

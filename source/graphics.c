@@ -55,15 +55,16 @@ pixel surface_get_pixel(struct surface *surface, struct vector2 position) {
 	return surface->pixels[position.y*surface->size.x + position.x];
 }
 
-void surface_set_pixel(struct surface *surface, struct vector2 position, pixel color) {
+bool surface_set_pixel(struct surface *surface, struct vector2 position, pixel color) {
 	if (position.x >= surface->size.x || position.y >= surface->size.y) {
-		return;
+		return false;
 	}
 	if (surface->parent_size.x) {
 		surface->pixels[(position.y + surface->offset.y)*surface->parent_size.x + position.x + surface->offset.x] = color;
-		return;
+	} else {
+		surface->pixels[position.y*surface->size.x + position.x] = color;
 	}
-	surface->pixels[position.y*surface->size.x + position.x] = color;
+	return true;
 }
 
 bool surface_is_valid(struct surface *surface) {
@@ -87,7 +88,9 @@ void surface_draw_line2(struct surface *surface, struct vector2 start, struct ve
 	float x = start.x;
 	float y = start.y;
 	for (uint32_t i = 0; i <= steps; ++i) {
-		surface_set_pixel(surface, vec2(round(x), round(y)), color);
+		if (!surface_set_pixel(surface, vec2(x, y), color)) {
+			return;
+		}
 		x += x_increment;
 		y += y_increment;
 	}
