@@ -78,10 +78,17 @@ void surface_draw_line2(struct surface *surface, struct vector2 start, struct ve
 
 void surface_draw_rectangle2(struct surface *surface, struct vector2 position, struct vector2 size, uint32_t thickness, pixel color);
 
+void surface_draw_rectangle_centered2(struct surface *surface, struct vector2 position, struct vector2 size, uint32_t thickness, pixel color);
+
 void surface_draw_rectangle_filled2(struct surface *surface, struct vector2 position, struct vector2 size, uint32_t border_thickness, pixel border_color, pixel fill_color);
 
+void surface_draw_rectangle_filled_centered2(struct surface *surface, struct vector2 position, struct vector2 size, uint32_t border_thickness, pixel border_color, pixel fill_color);
+
 // Scales `sprite` to fit `size`.
-void surface_draw_surface2(struct surface *surface, struct surface *sprite, struct vector2 position, struct vector2 size);
+void surface_draw_surface2(struct surface *surface, struct surface *sprite, struct vector2 position, struct vector2 size, float angle);
+
+// Scales `sprite` to fit `size`.
+void surface_draw_surface_centered2(struct surface *surface, struct surface *sprite, struct vector2 position, struct vector2 size, float angle);
 
 struct window window_create(char *name, struct vector2 position, struct vector2 size);
 

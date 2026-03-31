@@ -15,10 +15,8 @@ int main(void) {
 
 	struct surface sprite = surface_create(vec2(100, 100));
 	surface_fill(&sprite, COLOR_RED);
-	// surface_draw_rectangle_filled2(&sprite, vec2(0, 0), vec2(200, 200), 1, COLOR_WHITE, COLOR_RED);
 	surface_draw_line2(&sprite, vec2(0, 0), vec2(99, 99), 1, COLOR_WHITE);
-	surface_draw_line2(&sprite, vec2(0, 98), vec2(98, 0), 1, COLOR_WHITE);
-	// surface_draw_line2(&sprite, vec2(1, 99), vec2(99, 1), 1, COLOR_WHITE);
+	// surface_draw_line2(&sprite, vec2(0, 98), vec2(98, 0), 1, COLOR_WHITE);
 	surface_draw_line2(&sprite, vec2(0, 99), vec2(99, 0), 1, COLOR_WHITE);
 
 	float y = 0.0f;
@@ -31,17 +29,17 @@ int main(void) {
 		surface_fill(&surface, COLOR_BLUE);
 		// surface_draw_rectangle2(&surface, vec2(100, 100), vec2(100, 100), 1, COLOR_RED);//, COLOR_RED);
 		// surface_draw_line2(&surface, vec2(100, 200), vec2(200, 100), 1, COLOR_WHITE);
-		surface_draw_surface2(&surface, &sprite, vec2(100, 100), vec2(y, y));
+		surface_draw_surface_centered2(&surface, &sprite, vec2(100, 100), vec2(100, 100), y);
+		surface_draw_rectangle_centered2(&surface, vec2(100, 100), vec2(20, 20), 1, COLOR_GREEN);
 		
 		// Respond to events.
 		window_update(&window);
-		y = (y >= 100.0f) ? 0.0f : y + 0.05f;
+		y = (y >= 180.0f) ? 0.0f : y + 0.05f;
 
 		clock_gettime(CLOCK_MONOTONIC, &end);
 		double frame_time_seconds = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) * 1e-9;
 		// printf("frame time = %f, frame rate = %f\n", frame_time_seconds, 1.0/frame_time_seconds);
 	}
- 
 
 	surface_destroy(&sprite);
 
