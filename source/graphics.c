@@ -118,6 +118,12 @@ void surface_draw_rectangle_filled2(struct surface *surface, struct vector2 posi
 	}
 }
 
+void surface_draw_rectangle_filled_centered2(struct surface *surface, struct vector2 position, struct vector2 size, uint32_t border_thickness, pixel border_color, pixel fill_color) {
+	int32_t x = position.x - size.x/2;
+	int32_t y = position.y - size.y/2;
+	surface_draw_rectangle_filled2(surface, vec2(x, y), size, border_thickness, border_color, fill_color);
+}
+
 void surface_draw_surface2(struct surface *surface, struct surface *sprite, struct vector2 position, struct vector2 size, float angle) {
 	angle *= M_PI/180.0f;
 	float scale_x = (float)sprite->size.x/(float)size.x;
@@ -128,10 +134,12 @@ void surface_draw_surface2(struct surface *surface, struct surface *sprite, stru
 	int32_t end_y = min(position.y + size.y, surface->size.y);
 	for (int32_t surface_y = position.y; surface_y < end_y; ++surface_y) {
 		for (int32_t surface_x = position.x; surface_x < end_x; ++surface_x) {
-			int32_t sprite_x = scale_x*(float)(surface_x - position.x);
-			int32_t sprite_y = scale_y*(float)(surface_y - position.y);
-			int32_t rotated_surface_x = cos_angle*(float)(surface_x - position.x) - sin_angle*(float)(surface_y - position.y) + position.x;
-			int32_t rotated_surface_y = sin_angle*(float)(surface_x - position.x) + cos_angle*(float)(surface_y - position.y) + position.y;
+			float difference_x = surface_x - position.x;
+			float difference_y = surface_y - position.y;
+			int32_t sprite_x = scale_x*difference_x;
+			int32_t sprite_y = scale_y*difference_y;
+			int32_t rotated_surface_x = cos_angle*difference_x - sin_angle*difference_y + position.x;
+			int32_t rotated_surface_y = sin_angle*difference_x + cos_angle*difference_y + position.y;
 			surface_set_pixel(surface, vec2(rotated_surface_x, rotated_surface_y), surface_get_pixel(sprite, vec2(sprite_x, sprite_y)));
 		}
 	}
