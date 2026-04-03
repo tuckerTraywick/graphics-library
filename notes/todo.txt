@@ -1,7 +1,5 @@
-- Transfer to xcb instead of xlib
+- Add bounds checking to drawing functions
 - Make line drawing support thickness/AA and make it faster
-- Make sprite drawing support bilinear interpolation and rotation through shearing
+- Sprite rotation
 
-X Sprite rotation
-x Add bounds checking to drawing functions
 X Sprite drawing
