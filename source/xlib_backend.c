@@ -35,7 +35,8 @@ struct backend_window *backend_window_create(char *name, struct vector2 position
 	Visual *default_visual = DefaultVisual(window->x_display, default_screen);
 
 	window->surface = (struct surface){
-		.parent_size = vec2(DisplayWidth(window->x_display, default_screen), DisplayHeight(window->x_display, default_screen)),
+		.parent_size = size,
+		// .parent_size = vec2(DisplayWidth(window->x_display, default_screen), DisplayHeight(window->x_display, default_screen)),
 		.size = size,
 	};
 
@@ -101,7 +102,8 @@ struct surface *backend_window_get_surface(struct backend_window *window) {
 bool backend_window_update(struct backend_window *window) {
 	// Display the surface.
 	XShmPutImage(window->x_display, window->x_window, window->x_context, window->x_image, 0, 0, 0, 0, window->surface.size.x, window->surface.size.y, false);
-	XSync(window->x_display, false);
+	XFlush(window->x_display);
+	// XSync(window->x_display, false);
 	
 	// Check for events.
 	if (XPending(window->x_display)) {

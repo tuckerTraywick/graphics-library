@@ -6,7 +6,7 @@
 #include "graphics.h"
 
 int main(void) {
-	struct window *window = window_create("Hello World", vec2(0, 0), vec2(1920, 1080));
+	struct window *window = window_create("Hello World", vec2(0, 0), vec2(1280, 720));
 	if (!window_is_open(window)) {
 		fprintf(stderr, "Couldn't create window.\n");
 		return 1;
@@ -29,7 +29,7 @@ int main(void) {
 
 		// Draw stuff.
 		surface_fill(surface, COLOR_BLUE);
-		surface_draw_surface_centered2(surface, &sprite, vec2(200, 200), vec2(100, 100), y);
+		surface_draw_surface_centered2(surface, &sprite, vec2(y, y), vec2(y, y), y);
 		surface_draw_rectangle_centered2(surface, vec2(200, 200), vec2(20, 20), 1, COLOR_GREEN);
 		surface_draw_surface_centered2(surface, &sprite, mouse, vec2(y, y), -y);
 
