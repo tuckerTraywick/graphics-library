@@ -1,8 +1,11 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
 #include <X11/Xlib.h>
 #include <X11/Xft/Xft.h>
+#include <X11/extensions/XShm.h>
 #include "backend.h"
 #include "graphics.h"
 
@@ -12,6 +15,7 @@ struct backend_window {
 	Window x_window;
 	GC x_context;
 	XftDraw *xft_draw;
+	XShmSegmentInfo x_shm_info;
 	XImage *x_image;
 	Atom x_delete_window;
 };
@@ -30,18 +34,22 @@ struct backend_window *backend_window_create(char *name, struct vector2 position
 	int default_depth = DefaultDepth(window->x_display, default_screen);
 	Visual *default_visual = DefaultVisual(window->x_display, default_screen);
 
-	// Create the surface.
-	window->surface = surface_create(vec2(DisplayWidth(window->x_display, default_screen), DisplayHeight(window->x_display, default_screen)));
-	if (!surface_is_valid(&window->surface)) {
-		goto error2;
-	}
-	window->surface.parent_size = window->surface.size;
-	window->surface.size = size;
+	window->surface = (struct surface){
+		.parent_size = vec2(DisplayWidth(window->x_display, default_screen), DisplayHeight(window->x_display, default_screen)),
+		.size = size,
+	};
 
 	// Create the image.
-	window->x_image = XCreateImage(
-		window->x_display, default_visual, default_depth, ZPixmap, 0, (char*)window->surface.pixels, window->surface.parent_size.x, window->surface.parent_size.y, 32, 0
+	window->x_image = XShmCreateImage(
+		window->x_display, default_visual, default_depth, ZPixmap, NULL, &window->x_shm_info, window->surface.parent_size.x, window->surface.parent_size.y
 	);
+	// Allocate shared memory for the image's pixels.
+	window->x_shm_info.shmid = shmget(IPC_PRIVATE, window->surface.parent_size.x*window->surface.parent_size.y*sizeof *window->surface.pixels, IPC_CREAT | 0777);
+	window->x_shm_info.shmaddr = shmat(window->x_shm_info.shmid, NULL, 0);
+	window->x_shm_info.readOnly = false;
+	window->x_image->data = window->x_shm_info.shmaddr;
+	XShmAttach(window->x_display, &window->x_shm_info);
+	window->surface.pixels = (uint32_t*)window->x_shm_info.shmaddr;
 
 	// Create the graphics context.
 	XGCValues values = {
@@ -64,8 +72,10 @@ struct backend_window *backend_window_create(char *name, struct vector2 position
 error3:
 	XftDrawDestroy(window->xft_draw);
 	XFreeGC(window->x_display, window->x_context);
+	XShmDetach(window->x_display, &window->x_shm_info);
 	XDestroyImage(window->x_image);
-	// surface_destroy(&window->surface);
+	shmdt(window->x_shm_info.shmaddr);
+	shmctl(window->x_shm_info.shmid, IPC_RMID, NULL);
 error2:
 	XDestroyWindow(window->x_display, window->x_window);
 	XCloseDisplay(window->x_display);
@@ -90,9 +100,9 @@ struct surface *backend_window_get_surface(struct backend_window *window) {
 
 bool backend_window_update(struct backend_window *window) {
 	// Display the surface.
-	XPutImage(window->x_display, window->x_window, window->x_context, window->x_image, 0, 0, 0, 0, window->surface.size.x, window->surface.size.y);
-	XFlush(window->x_display);
-
+	XShmPutImage(window->x_display, window->x_window, window->x_context, window->x_image, 0, 0, 0, 0, window->surface.size.x, window->surface.size.y, false);
+	XSync(window->x_display, false);
+	
 	// Check for events.
 	if (XPending(window->x_display)) {
 		XEvent event = {0};

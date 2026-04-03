@@ -1,5 +1,5 @@
-args := $(shell pkg-config --cflags freetype2 x11 xft)
-libraries := -lm $(shell pkg-config --libs freetype2 x11 xft)
+args := $(shell pkg-config --cflags freetype2 x11 xft xext)
+libraries := -lm $(shell pkg-config --libs freetype2 x11 xft xext)
 cflags := -std=gnu99 -Wall -Wpedantic -Wextra -g3
 cc := gcc
 

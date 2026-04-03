@@ -75,7 +75,7 @@ void surface_fill(struct surface *surface, pixel color) {
 }
 
 bool surface_draw_pixel(struct surface *surface, struct vector2 position, pixel color) {
-	if (position.x >= surface->size.x || position.y >= surface->size.y) {
+	if (position.x < 0 || position.x >= surface->size.x || position.y < 0 || position.y >= surface->size.y) {
 		return false;
 	}
 	if (surface->parent_size.x) {
