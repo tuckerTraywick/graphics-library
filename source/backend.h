@@ -12,7 +12,6 @@ void backend_window_destroy(struct backend_window *window);
 
 struct surface *backend_window_get_surface(struct backend_window *window);
 
-
 struct vector2 backend_window_get_mouse_position(struct backend_window *window);
 
 // Returns true if the window is still open.

@@ -163,14 +163,19 @@ void surface_draw_surface_centered2(struct surface *surface, struct surface *spr
 	float cos_minus_angle = cosf(-angle);
 	float scale_x = (float)sprite->size.x/(float)size.x;
 	float scale_y = (float)sprite->size.y/(float)size.y;
+	// `*1.1f` to account for rounding errors cutting off edges and corners.
+	float size_x = round((float)size.x*abs(cos_angle) + (float)size.y*abs(sin_angle))*1.1f;
+	float size_y = round((float)size.y*abs(sin_angle) + (float)size.y*abs(cos_angle))*1.1f;
 	struct vector2 rotated_size = {
-		.x = (float)size.x*abs(cos_angle) + (float)size.y*abs(sin_angle),
-		.y = (float)size.y*abs(sin_angle) + (float)size.y*abs(cos_angle),
+		.x = size_x,
+		.y = size_y,
 	};
-	int32_t start_x = position.x - rotated_size.x/2;
-	int32_t start_y = position.y - rotated_size.y/2;
-	int32_t end_x = position.x + rotated_size.x/2;
-	int32_t end_y = position.y + rotated_size.y/2;
+	float half_size_x = (size_x*0.5);
+	float half_size_y = (size_y*0.5);
+	int32_t start_x = position.x - half_size_x;
+	int32_t start_y = position.y - half_size_y;
+	int32_t end_x = position.x + half_size_x;
+	int32_t end_y = position.y + half_size_y;
 	// surface_draw_rectangle_centered2(surface, position, rotated_size, 1, COLOR_WHITE);
 	for (int32_t surface_y = start_y; surface_y < end_y; ++surface_y) {
 		for (int32_t surface_x = start_x; surface_x < end_x; ++surface_x) {

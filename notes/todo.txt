@@ -1,7 +1,7 @@
 - Make line drawing support thickness/AA and make it faster
-- Make sprite rotation use inverse mapping
 - Make sprite drawing use bilinear interpolation
 
+X Make sprite rotation use inverse mapping
 X Make backend use shared memory
 X Sprite rotation
 X Add bounds checking to drawing functions
