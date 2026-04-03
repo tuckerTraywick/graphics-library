@@ -11,7 +11,7 @@ int main(void) {
 		fprintf(stderr, "Couldn't create window.\n");
 		return 1;
 	}
-	struct surface surface = window_get_surface(window);
+	struct surface *surface = window_get_surface(window);
 
 	struct surface sprite = surface_create(vec2(100, 100));
 	surface_fill(&sprite, COLOR_RED);
@@ -25,11 +25,11 @@ int main(void) {
 		clock_gettime(CLOCK_MONOTONIC, &start);
 
 		// Draw stuff.
-		surface_fill(&surface, COLOR_BLUE);
-		// surface_draw_rectangle2(&surface, vec2(100, 100), vec2(100, 100), 1, COLOR_RED);//, COLOR_RED);
-		// surface_draw_line2(&surface, vec2(100, 200), vec2(200, 100), 1, COLOR_WHITE);
-		surface_draw_surface_centered2(&surface, &sprite, vec2(100, 100), vec2(y, y), y);
-		surface_draw_rectangle_centered2(&surface, vec2(100, 100), vec2(20, 20), 1, COLOR_GREEN);
+		surface_fill(surface, COLOR_BLUE);
+		// surface_draw_rectangle2(surface, vec2(100, 100), vec2(100, 100), 1, COLOR_RED);//, COLOR_RED);
+		// surface_draw_line2(surface, vec2(100, 200), vec2(200, 100), 1, COLOR_WHITE);
+		surface_draw_surface_centered2(surface, &sprite, vec2(100, 100), vec2(y, y), y);
+		surface_draw_rectangle_centered2(surface, vec2(100, 100), vec2(20, 20), 1, COLOR_GREEN);
 		
 		// Respond to events.
 		window_update(window);

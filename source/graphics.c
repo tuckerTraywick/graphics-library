@@ -1,12 +1,13 @@
 #include <stdio.h>
 
-#include <stddef.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <math.h>
 #include <X11/Xlib.h>
 #include <X11/Xft/Xft.h>
 #include "graphics.h"
+#include "backend.h"
 
 #define abs(x) (((x) < 0) ? (-x) : (x))
 
@@ -18,18 +19,8 @@
 
 struct window {
 	char *name;
-	struct vector2 size;
-	struct vector2 resolution;
 	bool is_open;
-	pixel *frame_buffer;
-
-	// Xlib state.
-	Display *x_display;
-	Window x_window;
-	GC x_context;
-	XftDraw *xft_draw;
-	XImage *x_image;
-	Atom x_delete_window;
+	struct backend_window *backend_window;
 };
 
 struct surface surface_create(struct vector2 size) {
@@ -43,12 +34,12 @@ struct surface surface_create(struct vector2 size) {
 	return surface;
 }
 
-struct surface surface_create_with_pixels(pixel *pixels, struct vector2 size) {
-	return (struct surface){
-		.size = size,
-		.pixels = pixels,
-	};
-}
+// struct surface surface_create_with_pixels(pixel *pixels, struct vector2 size) {
+// 	return (struct surface){
+// 		.size = size,
+// 		.pixels = pixels,
+// 	};
+// }
 
 void surface_destroy(struct surface *surface) {
 	free(surface->pixels);
@@ -188,83 +179,27 @@ void surface_draw_surface_centered2(struct surface *surface, struct surface *spr
 struct window *window_create(char *name, struct vector2 position, struct vector2 size) {
 	struct window *window = malloc(sizeof *window);
 	if (!window) {
-		goto error1;
+		return NULL;
 	}
 	*window = (struct window){
 		.name = name,
-		.size = size,
 		.is_open = true,
+		.backend_window = backend_window_create(name, position, size),
 	};
-
-	// Setup the X window.
-	window->x_display = XOpenDisplay(NULL);
-	window->x_window = XCreateSimpleWindow(window->x_display, XDefaultRootWindow(window->x_display), (int)position.x, (int)position.y, size.x, size.y, 0, 0, 0);
-	XStoreName(window->x_display, window->x_window, name);
-	XMapWindow(window->x_display, window->x_window);
-	int default_screen = DefaultScreen(window->x_display);
-	int default_depth = DefaultDepth(window->x_display, default_screen);
-	Visual *default_visual = DefaultVisual(window->x_display, default_screen);
-	window->resolution = vec2(DisplayWidth(window->x_display, default_screen), DisplayHeight(window->x_display, default_screen));
-
-	// Allocate the framebuffer.
-	window->frame_buffer = calloc(window->resolution.x*window->resolution.y, sizeof *window->frame_buffer);
-	if (!window->frame_buffer) {
-		goto error2;
+	if (!window->backend_window) {
+		free(window);
+		return NULL;
 	}
-
-	// Setup the image.
-	window->x_image = XCreateImage(
-		window->x_display, default_visual, default_depth, ZPixmap, 0, (char*)window->frame_buffer, window->resolution.x, window->resolution.y, 32, 0
-	);
-
-	// Setup the graphics context.
-	XGCValues values = {
-		.foreground = WhitePixel(window->x_display, default_screen),
-		.background = BlackPixel(window->x_display, default_screen),
-		.line_width = 1,
-		.line_style = LineSolid,
-	};
-	unsigned long mask = GCBackground | GCForeground | GCLineWidth | GCLineStyle;
-	window->x_context = XCreateGC(window->x_display, window->x_window, mask, &values);
-	window->xft_draw = XftDrawCreate(window->x_display, window->x_window, DefaultVisual(window->x_display, default_screen), DefaultColormap(window->x_display, default_screen));
-
-	// Make it so we can detect the window being closed.
-	window->x_delete_window = XInternAtom(window->x_display, "WM_DELETE_WINDOW", False);
-	if (!XSetWMProtocols(window->x_display, window->x_window, &window->x_delete_window, 1)) {
-		goto error3;
-	}
-
 	return window;
-
-error3:
-	free(window->frame_buffer);
-	XDestroyImage(window->x_image);
-	XftDrawDestroy(window->xft_draw);
-error2:
-	XFreeGC(window->x_display, window->x_context);
-	XDestroyWindow(window->x_display, window->x_window);
-	XCloseDisplay(window->x_display);
-	free(window);
-error1:
-	return NULL;
 }
 
 void window_destroy(struct window *window) {
-	XDestroyImage(window->x_image);
-	XftDrawDestroy(window->xft_draw);
-	XFreeGC(window->x_display, window->x_context);
-	XDestroyWindow(window->x_display, window->x_window);
-	XCloseDisplay(window->x_display);
-	// free(window->frame_buffer); // Not freeing the frame buffer because `XDestroyImage()` frees it.
+	backend_window_destroy(window->backend_window);
 	free(window);
 }
 
-struct surface window_get_surface(struct window *window) {
-	return (struct surface){
-		.size = window->size,
-		.parent_size = window->resolution,
-		.pixels = window->frame_buffer,
-	};
+struct surface *window_get_surface(struct window *window) {
+	return backend_window_get_surface(window->backend_window);
 }
 
 bool window_is_open(struct window *window) {
@@ -272,19 +207,7 @@ bool window_is_open(struct window *window) {
 }
 
 void window_update(struct window *window) {
-	// Display the framebuffer.
-	XPutImage(window->x_display, window->x_window, window->x_context, window->x_image, 0, 0, 0, 0, window->size.x, window->size.y);
-	XFlush(window->x_display);
-
-	// Check for events.
-	if (!XPending(window->x_display)) {
-		return;
-	}
-	XEvent event = {0};
-	XNextEvent(window->x_display, &event); // Blocks.
-	if (event.type == ClientMessage) {
-		window->is_open = false;
-	}
+	window->is_open = backend_window_update(window->backend_window);
 }
 
 #undef abs

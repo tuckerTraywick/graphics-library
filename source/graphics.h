@@ -1,8 +1,8 @@
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <X11/Xlib.h>
 #include <X11/Xft/Xft.h>
 
@@ -44,7 +44,7 @@ struct surface surface_create(struct vector2 size);
 
 // Creates a new surface with the given pixels. Lets the user decide how to allocate pixels. You do
 // NOT have to call `surface_is_valid()` or `surface_destroy()` on the result of this function.
-struct surface surface_create_with_pixels(pixel *pixels, struct vector2 size);
+// struct surface surface_create_with_pixels(pixel *pixels, struct vector2 size);
 
 // Only call this on surfaces created with `surface_create()`.
 void surface_destroy(struct surface *surface);
@@ -81,7 +81,7 @@ struct window *window_create(char *name, struct vector2 position, struct vector2
 
 void window_destroy(struct window *window);
 
-struct surface window_get_surface(struct window *window);
+struct surface *window_get_surface(struct window *window);
 
 bool window_is_open(struct window *window);
 
