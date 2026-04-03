@@ -55,7 +55,19 @@ pixel surface_get_pixel(struct surface *surface, struct vector2 position) {
 	return surface->pixels[position.y*surface->size.x + position.x];
 }
 
-bool surface_set_pixel(struct surface *surface, struct vector2 position, pixel color) {
+bool surface_is_valid(struct surface *surface) {
+	return surface->pixels != NULL;
+}
+
+void surface_fill(struct surface *surface, pixel color) {
+	for (int32_t y = 0; y < surface->size.y; ++y) {
+		for (int32_t x = 0; x < surface->size.x; ++x) {
+			surface_draw_pixel(surface, vec2(x, y), color);
+		}
+	}
+}
+
+bool surface_draw_pixel(struct surface *surface, struct vector2 position, pixel color) {
 	if (position.x >= surface->size.x || position.y >= surface->size.y) {
 		return false;
 	}
@@ -67,18 +79,6 @@ bool surface_set_pixel(struct surface *surface, struct vector2 position, pixel c
 	return true;
 }
 
-bool surface_is_valid(struct surface *surface) {
-	return surface->pixels != NULL;
-}
-
-void surface_fill(struct surface *surface, pixel color) {
-	for (int32_t y = 0; y < surface->size.y; ++y) {
-		for (int32_t x = 0; x < surface->size.x; ++x) {
-			surface_set_pixel(surface, vec2(x, y), color);
-		}
-	}
-}
-
 // TODO: Account for line thickness.
 void surface_draw_line2(struct surface *surface, struct vector2 start, struct vector2 end, uint32_t thickness, pixel color) {
 	struct vector2 distance = vec2(end.x - start.x, end.y - start.y);
@@ -88,7 +88,7 @@ void surface_draw_line2(struct surface *surface, struct vector2 start, struct ve
 	float x = start.x;
 	float y = start.y;
 	for (uint32_t i = 0; i <= steps; ++i) {
-		if (!surface_set_pixel(surface, vec2(x, y), color)) {
+		if (!surface_draw_pixel(surface, vec2(x, y), color)) {
 			return;
 		}
 		x += x_increment;
@@ -143,7 +143,7 @@ void surface_draw_surface2(struct surface *surface, struct surface *sprite, stru
 			int32_t sprite_y = scale_y*difference_y;
 			int32_t rotated_surface_x = cos_angle*difference_x - sin_angle*difference_y + position.x;
 			int32_t rotated_surface_y = sin_angle*difference_x + cos_angle*difference_y + position.y;
-			surface_set_pixel(surface, vec2(rotated_surface_x, rotated_surface_y), surface_get_pixel(sprite, vec2(sprite_x, sprite_y)));
+			surface_draw_pixel(surface, vec2(rotated_surface_x, rotated_surface_y), surface_get_pixel(sprite, vec2(sprite_x, sprite_y)));
 		}
 	}
 }
@@ -164,7 +164,7 @@ void surface_draw_surface_centered2(struct surface *surface, struct surface *spr
 			float difference_y = surface_y - position.y;
 			int32_t rotated_surface_x = cos_angle*difference_x - sin_angle*difference_y + position.x;
 			int32_t rotated_surface_y = sin_angle*difference_x + cos_angle*difference_y + position.y;
-			surface_set_pixel(surface, vec2(rotated_surface_x, rotated_surface_y), surface_get_pixel(sprite, vec2(sprite_x, sprite_y)));
+			surface_draw_pixel(surface, vec2(rotated_surface_x, rotated_surface_y), surface_get_pixel(sprite, vec2(sprite_x, sprite_y)));
 		}
 	}
 }

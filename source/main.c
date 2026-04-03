@@ -16,7 +16,6 @@ int main(void) {
 	struct surface sprite = surface_create(vec2(100, 100));
 	surface_fill(&sprite, COLOR_RED);
 	surface_draw_line2(&sprite, vec2(0, 0), vec2(99, 99), 1, COLOR_WHITE);
-	// surface_draw_line2(&sprite, vec2(0, 98), vec2(98, 0), 1, COLOR_WHITE);
 	surface_draw_line2(&sprite, vec2(0, 99), vec2(99, 0), 1, COLOR_WHITE);
 
 	float y = 0.0f;
