@@ -36,21 +36,7 @@ struct surface {
 	pixel *pixels;
 };
 
-struct window {
-	char *name;
-	struct vector2 size;
-	struct vector2 resolution;
-	bool is_open;
-	pixel *frame_buffer;
-
-	// Xlib state.
-	Display *x_display;
-	Window x_window;
-	GC x_context;
-	XftDraw *xft_draw;
-	XImage *x_image;
-	Atom x_delete_window;
-};
+struct window;
 
 // You must call `surface_is_valid()` on the result of this function to make sure initialization was
 // successful and `surface_destroy()` when you are done with it.
@@ -91,7 +77,7 @@ void surface_draw_surface2(struct surface *surface, struct surface *sprite, stru
 // Scales `sprite` to fit `size`.
 void surface_draw_surface_centered2(struct surface *surface, struct surface *sprite, struct vector2 position, struct vector2 size, float angle);
 
-struct window window_create(char *name, struct vector2 position, struct vector2 size);
+struct window *window_create(char *name, struct vector2 position, struct vector2 size);
 
 void window_destroy(struct window *window);
 

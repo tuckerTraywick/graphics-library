@@ -1,5 +1,7 @@
-- Add bounds checking to drawing functions
 - Make line drawing support thickness/AA and make it faster
-- Sprite rotation
+- Make sprite rotation use inverse mapping
+- Make sprite drawing use bilinear interpolation
 
+X Sprite rotation
+X Add bounds checking to drawing functions
 X Sprite drawing

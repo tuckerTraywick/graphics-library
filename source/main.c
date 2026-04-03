@@ -6,12 +6,12 @@
 #include "graphics.h"
 
 int main(void) {
-	struct window window = window_create("Hello World", vec2(0, 0), vec2(800, 600));
-	if (!window_is_open(&window)) {
+	struct window *window = window_create("Hello World", vec2(0, 0), vec2(800, 600));
+	if (!window_is_open(window)) {
 		fprintf(stderr, "Couldn't create window.\n");
 		return 1;
 	}
-	struct surface surface = window_get_surface(&window);
+	struct surface surface = window_get_surface(window);
 
 	struct surface sprite = surface_create(vec2(100, 100));
 	surface_fill(&sprite, COLOR_RED);
@@ -19,7 +19,7 @@ int main(void) {
 	surface_draw_line2(&sprite, vec2(0, 99), vec2(99, 0), 1, COLOR_WHITE);
 
 	float y = 0.0f;
-	while (window_is_open(&window)) {
+	while (window_is_open(window)) {
 		struct timespec start = {0};
 		struct timespec end = {0};
 		clock_gettime(CLOCK_MONOTONIC, &start);
@@ -32,7 +32,7 @@ int main(void) {
 		surface_draw_rectangle_centered2(&surface, vec2(100, 100), vec2(20, 20), 1, COLOR_GREEN);
 		
 		// Respond to events.
-		window_update(&window);
+		window_update(window);
 		y = (y >= 180.0f) ? 0.0f : y + 0.05f;
 
 		clock_gettime(CLOCK_MONOTONIC, &end);
@@ -43,6 +43,6 @@ int main(void) {
 	surface_destroy(&sprite);
 
 	printf("Done.\n");
-	window_destroy(&window);
+	window_destroy(window);
 	return 0;
 }
