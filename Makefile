@@ -1,6 +1,6 @@
 args := $(shell pkg-config --cflags freetype2 x11 xft xext)
 libraries := -lm $(shell pkg-config --libs freetype2 x11 xft xext)
-cflags := -std=gnu99 -Wall -Wpedantic -Wextra -g3
+cflags := -std=gnu99 -Wall -Wpedantic -Wextra -g3 -O2
 cc := gcc
 
 source_files := $(shell find source -name '*.c' -not -name "main.c")

@@ -26,6 +26,7 @@ struct window {
 struct surface surface_create(struct vector2 size) {
 	struct surface surface = {
 		.size = size,
+		.parent_size = size,
 		.pixels = calloc(size.x*size.y, sizeof *surface.pixels),
 	};
 	if (!surface.pixels) {
@@ -33,13 +34,6 @@ struct surface surface_create(struct vector2 size) {
 	}
 	return surface;
 }
-
-// struct surface surface_create_with_pixels(pixel *pixels, struct vector2 size) {
-// 	return (struct surface){
-// 		.size = size,
-// 		.pixels = pixels,
-// 	};
-// }
 
 void surface_destroy(struct surface *surface) {
 	free(surface->pixels);
@@ -56,10 +50,7 @@ struct surface surface_get_subsurface(struct surface *surface, struct vector2 of
 }
 
 pixel surface_get_pixel(struct surface *surface, struct vector2 position) {
-	if (surface->parent_size.x) {
-		return surface->pixels[(position.y + surface->offset.y)*surface->parent_size.x + position.x + surface->offset.x];
-	}
-	return surface->pixels[position.y*surface->size.x + position.x];
+	return surface->pixels[(position.y + surface->offset.y)*surface->parent_size.x + position.x + surface->offset.x];
 }
 
 bool surface_is_valid(struct surface *surface) {
@@ -69,7 +60,7 @@ bool surface_is_valid(struct surface *surface) {
 void surface_fill(struct surface *surface, pixel color) {
 	for (int32_t y = 0; y < surface->size.y; ++y) {
 		for (int32_t x = 0; x < surface->size.x; ++x) {
-			surface_draw_pixel(surface, vec2(x, y), color);
+			surface->pixels[(y + surface->offset.y)*surface->parent_size.x + x + surface->offset.x] = color;
 		}
 	}
 }
@@ -78,11 +69,7 @@ bool surface_draw_pixel(struct surface *surface, struct vector2 position, pixel 
 	if (position.x < 0 || position.x >= surface->size.x || position.y < 0 || position.y >= surface->size.y) {
 		return false;
 	}
-	if (surface->parent_size.x) {
-		surface->pixels[(position.y + surface->offset.y)*surface->parent_size.x + position.x + surface->offset.x] = color;
-	} else {
-		surface->pixels[position.y*surface->size.x + position.x] = color;
-	}
+	surface->pixels[(position.y + surface->offset.y)*surface->parent_size.x + position.x + surface->offset.x] = color;
 	return true;
 }
 

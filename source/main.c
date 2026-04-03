@@ -6,7 +6,7 @@
 #include "graphics.h"
 
 int main(void) {
-	struct window *window = window_create("Hello World", vec2(0, 0), vec2(800, 600));
+	struct window *window = window_create("Hello World", vec2(0, 0), vec2(1920, 1080));
 	if (!window_is_open(window)) {
 		fprintf(stderr, "Couldn't create window.\n");
 		return 1;
@@ -20,6 +20,8 @@ int main(void) {
 
 	float y = 0.0f;
 	struct vector2 mouse = {0};
+	uint32_t samples = 0;
+	double avg_frame_time = 0.0f;
 	while (window_is_open(window)) {
 		struct timespec start = {0};
 		struct timespec end = {0};
@@ -27,9 +29,10 @@ int main(void) {
 
 		// Draw stuff.
 		surface_fill(surface, COLOR_BLUE);
-		surface_draw_surface_centered2(surface, &sprite, vec2(200, 200), vec2(10, 10), y);
+		surface_draw_surface_centered2(surface, &sprite, vec2(200, 200), vec2(100, 100), y);
 		surface_draw_rectangle_centered2(surface, vec2(200, 200), vec2(20, 20), 1, COLOR_GREEN);
-		
+		surface_draw_surface_centered2(surface, &sprite, mouse, vec2(y, y), -y);
+
 		// Respond to events.
 		window_update(window);
 		y = (y >= 180.0f) ? 0.0f : y + 0.1f;
@@ -37,7 +40,13 @@ int main(void) {
 
 		clock_gettime(CLOCK_MONOTONIC, &end);
 		double frame_time_seconds = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) * 1e-9;
-		printf("frame time = %f, frame rate = %f\n", frame_time_seconds, 1.0/frame_time_seconds);
+		avg_frame_time += frame_time_seconds;
+		++samples;
+		if (samples == 50) {
+			printf("frame rate = %f\n", 1.0/(avg_frame_time/(double)samples));
+			avg_frame_time = 0.0f;
+			samples = 0;
+		}
 	}
 
 	surface_destroy(&sprite);

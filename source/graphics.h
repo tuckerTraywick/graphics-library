@@ -42,10 +42,6 @@ struct window;
 // successful and `surface_destroy()` when you are done with it.
 struct surface surface_create(struct vector2 size);
 
-// Creates a new surface with the given pixels. Lets the user decide how to allocate pixels. You do
-// NOT have to call `surface_is_valid()` or `surface_destroy()` on the result of this function.
-// struct surface surface_create_with_pixels(pixel *pixels, struct vector2 size);
-
 // Only call this on surfaces created with `surface_create()`.
 void surface_destroy(struct surface *surface);
 
