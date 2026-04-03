@@ -2,6 +2,7 @@
 - Make sprite rotation use inverse mapping
 - Make sprite drawing use bilinear interpolation
 
+X Make backend use shared memory
 X Sprite rotation
 X Add bounds checking to drawing functions
 X Sprite drawing

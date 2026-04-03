@@ -87,4 +87,6 @@ bool window_is_open(struct window *window);
 
 void window_update(struct window *window);
 
+struct vector2 window_get_mouse_position(struct window *window);
+
 #endif // GRAPHICS_H

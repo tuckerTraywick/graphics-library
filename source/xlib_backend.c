@@ -111,3 +111,13 @@ bool backend_window_update(struct backend_window *window) {
 	}
 	return true;
 }
+
+struct vector2 backend_window_get_mouse_position(struct backend_window *window) {
+	Window root, child;
+	int root_x, root_y;
+	unsigned int mask;
+	int mouse_x = 0;
+	int mouse_y = 0;
+	XQueryPointer(window->x_display, window->x_window, &root, &child, &root_x, &root_y, &mouse_x, &mouse_y, &mask);
+	return vec2(mouse_x, mouse_y);
+}

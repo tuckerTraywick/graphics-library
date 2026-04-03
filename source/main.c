@@ -19,6 +19,7 @@ int main(void) {
 	surface_draw_line2(&sprite, vec2(0, 99), vec2(99, 0), 1, COLOR_WHITE);
 
 	float y = 0.0f;
+	struct vector2 mouse = {0};
 	while (window_is_open(window)) {
 		struct timespec start = {0};
 		struct timespec end = {0};
@@ -26,12 +27,13 @@ int main(void) {
 
 		// Draw stuff.
 		surface_fill(surface, COLOR_BLUE);
-		surface_draw_surface_centered2(surface, &sprite, vec2(200, 200), vec2(y, y), y);
-		surface_draw_rectangle_centered2(surface, vec2(200, 200), vec2(20, 20), 1, COLOR_GREEN);
+		surface_draw_surface_centered2(surface, &sprite, mouse, vec2(y, y), y);
+		surface_draw_rectangle_centered2(surface, mouse, vec2(20, 20), 1, COLOR_GREEN);
 		
 		// Respond to events.
 		window_update(window);
 		y = (y >= 180.0f) ? 0.0f : y + 0.1f;
+		mouse = window_get_mouse_position(window);
 
 		clock_gettime(CLOCK_MONOTONIC, &end);
 		double frame_time_seconds = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) * 1e-9;

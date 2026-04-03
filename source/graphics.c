@@ -210,6 +210,10 @@ void window_update(struct window *window) {
 	window->is_open = backend_window_update(window->backend_window);
 }
 
+struct vector2 window_get_mouse_position(struct window *window) {
+	return backend_window_get_mouse_position(window->backend_window);
+}
+
 #undef abs
 #undef round
 #undef min
