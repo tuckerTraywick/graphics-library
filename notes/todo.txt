@@ -1,3 +1,6 @@
+- Reading/writing bitmap image files
+- Reading bitmap font files
+- Copy improvements to `surface_draw_surface2()`
 - Make line drawing support thickness/AA and make it faster
 - Make sprite drawing use bilinear interpolation
 
