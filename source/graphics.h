@@ -3,8 +3,6 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include <X11/Xlib.h>
-#include <X11/Xft/Xft.h>
 
 #define COLOR_OPAQUE 0xFFFFFFFF
 
