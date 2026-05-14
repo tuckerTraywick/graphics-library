@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include "graphics.h"
 
-
 // int main(void) {
 // 	// Open the window.
 // 	struct window *window = window_create("Hello World", vec2(0, 0), vec2(1280, 720));
