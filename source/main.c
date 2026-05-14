@@ -88,5 +88,12 @@
 // }
 
 int main(void) {
+	struct window *window = window_create("hello", vec2(0, 0), vec2(800, 600));
+
+	while (window_is_open(window)) {
+		window_update(window);
+	}
+
+	window_destroy(window);
 	return 0;
 }
